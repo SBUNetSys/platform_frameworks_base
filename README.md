@@ -1,6 +1,6 @@
 # platform_frameworks_base
 
-Framework base modifications for UIWear
+AOSP Framework base modifications for UIWear
 
 ## Basic workflow
 
