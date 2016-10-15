@@ -14,7 +14,7 @@
 3. Sync source code
     - `cd your_working_dir`
     - `repo init -u https://android.googlesource.com/platform/manifest -b android-6.0.1_r60`
-    - `git clone https://github.com/SBUNetSys/local_manifests.git > .repo/local_manifests`
+    - `git clone https://github.com/SBUNetSys/local_manifests.git .repo/local_manifests`
     (If local_manifests directory already exists, just put [uiwear_aosp_hammerhead.xml](https://raw.githubusercontent.com/SBUNetSys/local_manifests/master/uiwear_aosp_hammerhead.xml) into it)
     - `repo sync` or ues `repo sync -j8` for 4-core CPU
 
