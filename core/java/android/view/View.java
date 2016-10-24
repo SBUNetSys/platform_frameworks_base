@@ -3769,6 +3769,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     private static SparseArray<String> mAttributeMap;
 
     /**
+     * XUJAY: Get package name
+     */
+    public String getPackageName() {
+        return getContext().getPackageName();
+    }
+
+    /**
      * @hide
      */
     String mStartActivityRequestWho;
@@ -5756,6 +5763,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @see AccessibilityDelegate
      */
     public void sendAccessibilityEvent(int eventType) {
+        Log.i(VIEW_LOG_TAG, "XUJAY....sendAccessibilityEvent");
         if (mAccessibilityDelegate != null) {
             mAccessibilityDelegate.sendAccessibilityEvent(this, eventType);
         } else {
@@ -5827,6 +5835,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @hide
      */
     public void sendAccessibilityEventUncheckedInternal(AccessibilityEvent event) {
+        Log.i("XUJAY....", "sendAccessibilityEventUncheckedInternal: isShown()" + isShown());
         if (!isShown()) {
             return;
         }
@@ -5837,6 +5846,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         }
         // In the beginning we called #isShown(), so we know that getParent() is not null.
         getParent().requestSendAccessibilityEvent(this, event);
+
     }
 
     /**
@@ -7047,9 +7057,15 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         View current = this;
         //noinspection ConstantConditions
         do {
-            if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
-                return false;
+            //Log.i("XUJAY....", "isShown() in package: " +  mContext.getPackageName());
+            if (mContext.getPackageName().contains("datepicker")) {
+                
+            } else {
+                if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
+                    return false;
+                }
             }
+
             ViewParent parent = current.mParent;
             if (parent == null) {
                 return false; // We are not attached to the view root
@@ -9266,16 +9282,17 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @return True if the event was handled by the view, false otherwise.
      */
     public boolean dispatchTouchEvent(MotionEvent event) {
+        Log.i("XUJAY....", "dispatchTouchEvent..");
         // If the event should be handled by accessibility focus first.
         if (event.isTargetAccessibilityFocus()) {
             // We don't have focus or no virtual descendant has it, do not handle the event.
             if (!isAccessibilityFocusedViewOrHost()) {
+                Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
                 return false;
             }
             // We have focus and got the event, then use normal event dispatch.
             event.setTargetAccessibilityFocus(false);
         }
-
         boolean result = false;
 
         if (mInputEventConsistencyVerifier != null) {
@@ -9287,7 +9304,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             // Defensive cleanup for new gesture
             stopNestedScroll();
         }
-
+        Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
         if (onFilterTouchEventForSecurity(event)) {
             //noinspection SimplifiableIfStatement
             ListenerInfo li = mListenerInfo;
@@ -9296,10 +9313,17 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     && li.mOnTouchListener.onTouch(this, event)) {
                 result = true;
             }
-
-            if (!result && onTouchEvent(event)) {
-                result = true;
+            Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
+                  + " result:" + result);
+            if (!result) {
+                Log.i("XUJAY...", "dispatchTouchEvent calling onTouchEvent()");
+                if (onTouchEvent(event)) {   // XUJAY: This normally sets true
+                    result = true;
+                }
+                Log.i("XUJAY...", "After dispatchTouchEvent calling onTouchEvent():" + result);
             }
+            Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
+                  + " result:" + result);
         }
 
         if (!result && mInputEventConsistencyVerifier != null) {
@@ -9314,7 +9338,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 (actionMasked == MotionEvent.ACTION_DOWN && !result)) {
             stopNestedScroll();
         }
-
+        Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
+              + " result:" + result);
         return result;
     }
 
@@ -9368,6 +9393,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @return True if the event was handled by the view, false otherwise.
      */
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        Log.i("XUJAY...", "dispatchGenericMotionEvent....");
         if (mInputEventConsistencyVerifier != null) {
             mInputEventConsistencyVerifier.onGenericMotionEvent(event, 0);
         }
@@ -9379,22 +9405,27 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     || action == MotionEvent.ACTION_HOVER_MOVE
                     || action == MotionEvent.ACTION_HOVER_EXIT) {
                 if (dispatchHoverEvent(event)) {
+                    Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
                     return true;
                 }
             } else if (dispatchGenericPointerEvent(event)) {
+                Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
                 return true;
             }
         } else if (dispatchGenericFocusedEvent(event)) {
+            Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
             return true;
         }
 
         if (dispatchGenericMotionEventInternal(event)) {
+            Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
             return true;
         }
 
         if (mInputEventConsistencyVerifier != null) {
             mInputEventConsistencyVerifier.onUnhandledEvent(event, 0);
         }
+        Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
         return false;
     }
 
@@ -9516,7 +9547,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @hide
      */
     public final boolean dispatchPointerEvent(MotionEvent event) {
+        Log.i("XUJAY.....", "dispatching the dispatching event....." + toString());
         if (event.isTouchEvent()) {
+            Log.i("XUJAY....", "is touching event....");
             return dispatchTouchEvent(event);
         } else {
             return dispatchGenericMotionEvent(event);
@@ -10269,6 +10302,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @return True if the event was handled, false otherwise.
      */
     public boolean onTouchEvent(MotionEvent event) {
+        Log.i("XUJAY...", "onTouchEvent()....");
+
         final float x = event.getX();
         final float y = event.getY();
         final int viewFlags = mViewFlags;
@@ -10400,10 +10435,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     }
                     break;
             }
-
+            Log.i("XUJAY...", "onTouchEvent()...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
             return true;
         }
-
+        Log.i("XUJAY...", "onTouchEvent()...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
         return false;
     }
 

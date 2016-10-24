@@ -391,6 +391,13 @@ public abstract class AccessibilityService extends Service {
     public abstract void onAccessibilityEvent(AccessibilityEvent event);
 
     /**
+     * This API captures event from background applications
+     *
+     * @param event An event.
+     */
+    public abstract void onAccessibilityEventForBackground(AccessibilityEvent event);
+
+    /**
      * Callback for interrupting the accessibility feedback.
      */
     public abstract void onInterrupt();
@@ -657,7 +664,7 @@ public abstract class AccessibilityService extends Service {
             public void onAccessibilityEvent(AccessibilityEvent event) {
                 AccessibilityService.this.onAccessibilityEvent(event);
             }
-
+                
             @Override
             public void init(int connectionId, IBinder windowToken) {
                 mConnectionId = connectionId;
@@ -695,6 +702,7 @@ public abstract class AccessibilityService extends Service {
         private static final int DO_ON_GESTURE = 4;
         private static final int DO_CLEAR_ACCESSIBILITY_CACHE = 5;
         private static final int DO_ON_KEY_EVENT = 6;
+        private static final int DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND = 7;
 
         private final HandlerCaller mCaller;
 
@@ -745,7 +753,9 @@ public abstract class AccessibilityService extends Service {
         public void executeMessage(Message message) {
             switch (message.what) {
                 case DO_ON_ACCESSIBILITY_EVENT: {
+                    Log.i("XUJAY...", "DO_ON_ACCESSIBILITY_EVENT: here is the executeMessage().....");
                     AccessibilityEvent event = (AccessibilityEvent) message.obj;
+
                     if (event != null) {
                         AccessibilityInteractionClient.getInstance().onAccessibilityEvent(event);
                         mCallback.onAccessibilityEvent(event);

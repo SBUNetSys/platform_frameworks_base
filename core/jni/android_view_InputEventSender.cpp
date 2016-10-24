@@ -281,6 +281,9 @@ static jboolean nativeSendKeyEvent(JNIEnv* env, jclass clazz, jlong senderPtr,
 
 static jboolean nativeSendMotionEvent(JNIEnv* env, jclass clazz, jlong senderPtr,
         jint seq, jobject eventObj) {
+
+    ALOGI("JNI nativeSendMotionEvent...JX.......................");
+
     sp<NativeInputEventSender> sender =
             reinterpret_cast<NativeInputEventSender*>(senderPtr);
     MotionEvent* event = android_view_MotionEvent_getNativePtr(env, eventObj);

@@ -36,6 +36,7 @@ import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
 import com.android.internal.os.SomeArgs;
 import com.android.internal.util.Predicate;
 
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,7 +94,8 @@ final class AccessibilityInteractionController {
         // tree traversal.
         return (view.mAttachInfo != null
                 && view.mAttachInfo.mWindowVisibility == View.VISIBLE
-                && view.isShown());
+                && view.isShown()) ||
+                (view.mAttachInfo != null && view.getPackageName().contains("datepicker"));
     }
 
     public void findAccessibilityNodeInfoByAccessibilityIdClientThread(
@@ -154,7 +156,9 @@ final class AccessibilityInteractionController {
             }
             if (root != null && isShown(root)) {
                 mPrefetcher.prefetchAccessibilityNodeInfos(root, virtualDescendantId, flags, infos);
+                Log.i("XUJAY....", "Prefetching the accessibility nodes");
             }
+
         } finally {
             try {
                 mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
@@ -246,6 +250,7 @@ final class AccessibilityInteractionController {
                     mAddNodeInfosForViewId = new AddNodeInfosForViewId();
                 }
                 mAddNodeInfosForViewId.init(resolvedViewId, infos);
+                Log.i("XUJAY....", "root.findViewByPredicate(mAddNodeInfosForViewId)");
                 root.findViewByPredicate(mAddNodeInfosForViewId);
                 mAddNodeInfosForViewId.reset();
             }
@@ -329,6 +334,7 @@ final class AccessibilityInteractionController {
                 root = mViewRootImpl.mView;
             }
             if (root != null && isShown(root)) {
+                Log.i("XUJAY....", "findAccessibilityNodeInfosByTextUiThread .....");
                 AccessibilityNodeProvider provider = root.getAccessibilityNodeProvider();
                 if (provider != null) {
                     if (virtualDescendantId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
@@ -1227,10 +1233,42 @@ final class AccessibilityInteractionController {
 
         @Override
         public boolean apply(View view) {
-            if (view.getId() == mViewId && isShown(view)) {
+            if (view.getPackageName().contains("datepicker")) {
+                if (view.getId() == mViewId) {
+                    Log.i("XUJAY....", "Predicate: apply mviewid " + mViewId);
+                    mInfos.add(view.createAccessibilityNodeInfo());
+                }
+            } else {
+                if (view.getId() == mViewId && isShown(view)) {
+                    mInfos.add(view.createAccessibilityNodeInfo());
+                }
+            }
+            return false;
+        }
+    }
+
+    private final class UIWearAddNodeInfosForViewId implements Predicate<View> {
+        private int mViewId = View.NO_ID;
+        private List<AccessibilityNodeInfo> mInfos;
+
+        public void init(int viewId, List<AccessibilityNodeInfo> infos) {
+            mViewId = viewId;
+            mInfos = infos;
+        }
+
+        public void reset() {
+            mViewId = View.NO_ID;
+            mInfos = null;
+        }
+
+        // Comparing to AddNodeInfosForViewId, the only difference is this function
+        @Override
+        public boolean apply(View view) {
+            if (view.getId() == mViewId) {
                 mInfos.add(view.createAccessibilityNodeInfo());
             }
             return false;
         }
     }
+
 }

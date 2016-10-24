@@ -999,6 +999,13 @@ public final class ViewRootImpl implements ViewParent,
     }
 
     void setWindowStopped(boolean stopped) {
+        // XUJAY: make the activity alive when the app is the Setting App
+        Log.i("XUJAY...", "setWindowStopped(): " + stopped + " packagename:" + mBasePackageName);
+        if (mBasePackageName != null && mBasePackageName.contains("datepicker")) {
+            mStopped = false;
+            return;
+        }
+
         if (mStopped != stopped) {
             mStopped = stopped;
             if (!mStopped) {
@@ -3710,12 +3717,21 @@ public final class ViewRootImpl implements ViewParent,
             if (mView == null || !mAdded) {
                 Slog.w(TAG, "Dropping event due to root view being removed: " + q.mEvent);
                 return true;
-            } else if ((!mAttachInfo.mHasWindowFocus
-                    && !q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) || mStopped
-                    || mIsAmbientMode || (mPausedForTransition && !isBack(q.mEvent))) {
+            } else if ((!mAttachInfo.mHasWindowFocus && !q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER))
+                       || mStopped || mIsAmbientMode || (mPausedForTransition && !isBack(q.mEvent))) {
+                
+                Slog.w(TAG,
+                       "mAttachInfo.mHasWindowFocus:" + mAttachInfo.mHasWindowFocus
+                       + ", q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER):" + q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER)
+                       + ", mstopped: " + mStopped
+                       + ", mIsAmbientMode: " + mIsAmbientMode
+                       + ", (mPausedForTransition && !isBack(q.mEvent)): " + (mPausedForTransition && !isBack(q.mEvent)));
+
                 // This is a focus event and the window doesn't currently have input focus or
                 // has stopped. This could be an event that came back from the previous stage
                 // but the window has lost focus or stopped in the meantime.
+                Slog.w(TAG, "isTerminalInputEvent(q.mEvent): " + isTerminalInputEvent(q.mEvent));
+
                 if (isTerminalInputEvent(q.mEvent)) {
                     // Don't drop terminal input events, however mark them as canceled.
                     q.mEvent.cancel();
@@ -3723,6 +3739,7 @@ public final class ViewRootImpl implements ViewParent,
                     return false;
                 }
 
+                // XUJAY:....dropping here........
                 // Drop non-terminal input events.
                 Slog.w(TAG, "Dropping event due to no window focus: " + q.mEvent);
                 return true;
@@ -4101,6 +4118,7 @@ public final class ViewRootImpl implements ViewParent,
                 handleDispatchWindowAnimationStopped();
                 final int source = q.mEvent.getSource();
                 if ((source & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+                    // XUJAY....
                     return processPointerEvent(q);
                 } else if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
                     return processTrackballEvent(q);
@@ -4231,7 +4249,9 @@ public final class ViewRootImpl implements ViewParent,
             return FORWARD;
         }
 
+        // XUJAY: Change here
         private int processPointerEvent(QueuedInputEvent q) {
+            Log.i("XUJAY...", "ViewRootImpl.processPointerEvent()....");
             final MotionEvent event = (MotionEvent)q.mEvent;
 
             mAttachInfo.mUnbufferedDispatchRequested = false;
@@ -5969,6 +5989,8 @@ public final class ViewRootImpl implements ViewParent,
         } else {
             final MotionEvent motionEvent = (MotionEvent)event;
             final int action = motionEvent.getAction();
+
+            Log.i(TAG, "isTerminalInputEvent(action).." + action);
             return action == MotionEvent.ACTION_UP
                     || action == MotionEvent.ACTION_CANCEL
                     || action == MotionEvent.ACTION_HOVER_EXIT;
@@ -6343,6 +6365,9 @@ public final class ViewRootImpl implements ViewParent,
         if (mView == null || mStopped || mPausedForTransition) {
             return false;
         }
+        Log.i("XUJAY....", "requestSendAccessibilityEvent line:"
+              + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
         // Intercept accessibility focus events fired by virtual nodes to keep
         // track of accessibility focus position in such nodes.
         final int eventType = event.getEventType();
@@ -6386,6 +6411,10 @@ public final class ViewRootImpl implements ViewParent,
                 handleWindowContentChangedEvent(event);
             } break;
         }
+
+        Log.i("XUJAY....", "requestSendAccessibilityEvent line:"
+              + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
         mAccessibilityManager.sendAccessibilityEvent(event);
         return true;
     }

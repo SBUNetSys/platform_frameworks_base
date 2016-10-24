@@ -66,7 +66,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see Context#ACCESSIBILITY_SERVICE
  */
 public final class AccessibilityManager {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String LOG_TAG = "AccessibilityManager";
 

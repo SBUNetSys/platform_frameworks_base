@@ -285,6 +285,7 @@ public final class AccessibilityInteractionClient
                         Log.i(LOG_TAG, "Node cache miss");
                     }
                 }
+                Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 1");
                 final int interactionId = mInteractionIdCounter.getAndIncrement();
                 final long identityToken = Binder.clearCallingIdentity();
                 final boolean success = connection.findAccessibilityNodeInfoByAccessibilityId(
@@ -293,10 +294,12 @@ public final class AccessibilityInteractionClient
                 Binder.restoreCallingIdentity(identityToken);
                 // If the scale is zero the call has failed.
                 if (success) {
+                    Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 2");
                     List<AccessibilityNodeInfo> infos = getFindAccessibilityNodeInfosResultAndClear(
                             interactionId);
                     finalizeAndCacheAccessibilityNodeInfos(infos, connectionId);
                     if (infos != null && !infos.isEmpty()) {
+                        Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 3");
                         return infos.get(0);
                     }
                 }
@@ -309,6 +312,8 @@ public final class AccessibilityInteractionClient
             Log.e(LOG_TAG, "Error while calling remote"
                     + " findAccessibilityNodeInfoByAccessibilityId", re);
         }
+        Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....connection error!");
+
         return null;
     }
 

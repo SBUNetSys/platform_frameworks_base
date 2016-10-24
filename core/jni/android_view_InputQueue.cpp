@@ -132,6 +132,7 @@ void InputQueue::finishEvent(InputEvent* event, bool handled) {
 }
 
 void InputQueue::handleMessage(const Message& message) {
+    ALOGI("InputQueue::handleMessage.......................");
     switch(message.what) {
     case MSG_FINISH_INPUT:
         JNIEnv* env = AndroidRuntime::getJNIEnv();

@@ -34,7 +34,7 @@ final class AccessibilityCache {
 
     private static final String LOG_TAG = "AccessibilityCache";
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;  // XUJAY
 
     private static final boolean CHECK_INTEGRITY = "eng".equals(Build.TYPE);
 
@@ -55,7 +55,8 @@ final class AccessibilityCache {
     public void addWindow(AccessibilityWindowInfo window) {
         synchronized (mLock) {
             if (DEBUG) {
-                Log.i(LOG_TAG, "Caching window: " + window.getId());
+                //Log.i(LOG_TAG, "Caching window: " + window.getId());
+                Log.i("XUJAY....", "Caching window: " + window.getId());
             }
             final int windowId = window.getId();
             AccessibilityWindowInfo oldWindow = mWindowCache.get(windowId);
@@ -139,20 +140,33 @@ final class AccessibilityCache {
         if (DEBUG) {
             Log.i(LOG_TAG, "Refreshing cached node.");
         }
+        // for (int i = 0; i < mWindowCache.size(); ++i) {
+        //     String pkgName = "";
+        //     AccessibilityWindowInfo winfo = mWindowCache.valueAt(i);
+        //     if (winfo.getRoot() != null && winfo.getRoot().getPackageName() != null) {
+        //         pkgName = winfo.getRoot().getPackageName().toString();
+        //     }
+        //     Log.i("XUJAY....", "refreshCachedNodeLocked.....windowIds " + mWindowCache.keyAt(i)
+        //           + "\t " + mWindowCache.valueAt(i) + "\t" + "pkgName:" + pkgName);
+        // }
 
+        Log.i("XUJAY....", "refreshCachedNodeLocked.....1, windowId " + windowId);
         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
         if (nodes == null) {
             return;
         }
+        Log.i("XUJAY....", "refreshCachedNodeLocked.....2");
         AccessibilityNodeInfo cachedInfo = nodes.get(sourceId);
         // If the source is not in the cache - nothing to do.
         if (cachedInfo == null) {
             return;
         }
+        Log.i("XUJAY....", "refreshCachedNodeLocked.....3");
         // The node changed so we will just refresh it right now.
         if (cachedInfo.refresh(true)) {
             return;
         }
+        Log.i("XUJAY....", "refreshCachedNodeLocked.....4");
         // Weird, we could not refresh. Just evict the entire sub-tree.
         clearSubTreeLocked(windowId, sourceId);
     }
@@ -281,15 +295,26 @@ final class AccessibilityCache {
                 Log.i(LOG_TAG, "clear()");
             }
             final int windowCount = mWindowCache.size();
+            int datepickerWindowId = -1;
             for (int i = windowCount - 1; i >= 0; i--) {
                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
-                window.recycle();
-                mWindowCache.removeAt(i);
+                
+                if (mWindowCache.keyAt(i) == 9) {
+                    //Log.i("XUJAY....", "window package is " + window.getRoot().getPackageName());
+                    datepickerWindowId = mWindowCache.keyAt(i);
+                } else {
+                    Log.i("XUJAY....", "Now Remove window " + window);
+                    window.recycle();
+                    mWindowCache.removeAt(i);
+                }
             }
             final int nodesForWindowCount = mNodeCache.size();
             for (int i = 0; i < nodesForWindowCount; i++) {
                 final int windowId = mNodeCache.keyAt(i);
-                clearNodesForWindowLocked(windowId);
+
+                if (windowId != datepickerWindowId) {
+                    clearNodesForWindowLocked(windowId);
+                }
             }
 
             mAccessibilityFocus = AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
@@ -301,6 +326,7 @@ final class AccessibilityCache {
         if (DEBUG) {
             Log.i(LOG_TAG, "clearNodesForWindowLocked(" + windowId + ")");
         }
+
         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
         if (nodes == null) {
             return;
@@ -309,6 +335,9 @@ final class AccessibilityCache {
         final int nodeCount = nodes.size();
         for (int i = nodeCount - 1; i >= 0; i--) {
             AccessibilityNodeInfo info = nodes.valueAt(i);
+            if (DEBUG) {
+                Log.i(LOG_TAG, "[XUJAY]Remove Node: " + info);
+            }
             nodes.removeAt(i);
             info.recycle();
         }
@@ -324,8 +353,27 @@ final class AccessibilityCache {
      */
     private void clearSubTreeLocked(int windowId, long rootNodeId) {
         if (DEBUG) {
-            Log.i(LOG_TAG, "Clearing cached subtree.");
+            Log.i(LOG_TAG, "Clearing cached subtree. windowId: " + windowId
+                  + " , rootNodeId: " + rootNodeId);
         }
+
+        /////////////////////XUJAY//////////////////////
+        {
+            LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
+            if (nodes == null) {
+                return;
+            }
+            AccessibilityNodeInfo current = nodes.get(rootNodeId);
+            if (current == null) {
+                return;
+            }
+            if (windowId == 9) {
+                Log.i("XUJAY....", "Skip the clearSubTreeLocked");
+                return;
+            }
+        }
+        /////////////////////XUJAY//////////////////////
+
         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
         if (nodes != null) {
             clearSubTreeRecursiveLocked(nodes, rootNodeId);

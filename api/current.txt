@@ -39964,6 +39964,7 @@ package android.view {
     method protected int computeVerticalScrollRange();
     method public android.view.accessibility.AccessibilityNodeInfo createAccessibilityNodeInfo();
     method public void createContextMenu(android.view.ContextMenu);
+    method public android.graphics.Bitmap createSnapshot(android.graphics.Bitmap.Config, int, boolean);
     method public void destroyDrawingCache();
     method public android.view.WindowInsets dispatchApplyWindowInsets(android.view.WindowInsets);
     method public void dispatchConfigurationChanged(android.content.res.Configuration);

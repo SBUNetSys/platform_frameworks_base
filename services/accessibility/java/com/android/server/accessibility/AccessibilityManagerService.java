@@ -118,7 +118,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class AccessibilityManagerService extends IAccessibilityManager.Stub {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String LOG_TAG = "AccessibilityManagerService";
 
@@ -422,11 +422,19 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             // performs the current profile parent resolution..
             final int resolvedUserId = mSecurityPolicy
                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
+
+            Slog.i("XUJAY....", "sendAccessibilityEvent line:"
+                   + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
             // This method does nothing for a background user.
             if (resolvedUserId != mCurrentUserId) {
+                Slog.i("XUJAY....", "sendAccessibilityEvent() recycle the event");
                 return true; // yes, recycle the event
             }
             if (mSecurityPolicy.canDispatchAccessibilityEventLocked(event)) {
+                Slog.i("XUJAY....", "sendAccessibilityEvent line:"
+                       + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
                 mSecurityPolicy.updateActiveAndAccessibilityFocusedWindowLocked(event.getWindowId(),
                         event.getSourceNodeId(), event.getEventType());
                 mSecurityPolicy.updateEventSourceLocked(event);
@@ -434,12 +442,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                 notifyAccessibilityServicesDelayedLocked(event, true);
             }
             if (mHasInputFilter && mInputFilter != null) {
+                Slog.i("XUJAY....", "sendAccessibilityEvent line:"
+                       + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
                 mMainHandler.obtainMessage(MainHandler.MSG_SEND_ACCESSIBILITY_EVENT_TO_INPUT_FILTER,
                         AccessibilityEvent.obtain(event)).sendToTarget();
             }
             event.recycle();
             getUserStateLocked(resolvedUserId).mHandledFeedbackTypes = 0;
         }
+
+        Slog.i("XUJAY....", "sendAccessibilityEvent return: " + (OWN_PROCESS_ID != Binder.getCallingPid()));
         return (OWN_PROCESS_ID != Binder.getCallingPid());
     }
 
@@ -1042,6 +1055,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
      */
     private void notifyAccessibilityServicesDelayedLocked(AccessibilityEvent event,
             boolean isDefault) {
+
+        Slog.i("XUJAY....", "notifyAccessibilityServicesDelayedLocked line:"
+               + Thread.currentThread().getStackTrace()[2].getLineNumber());
+
         try {
             UserState state = getCurrentUserStateLocked();
             for (int i = 0, count = state.mBoundServices.size(); i < count; i++) {
@@ -1051,6 +1068,8 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                     if (canDispatchEventToServiceLocked(service, event,
                             state.mHandledFeedbackTypes)) {
                         state.mHandledFeedbackTypes |= service.mFeedbackType;
+                        Slog.i("XUJAY....", "notifyAccessibilityServicesDelayedLocked line:"
+                               + Thread.currentThread().getStackTrace()[2].getLineNumber());
                         service.notifyAccessibilityEvent(event);
                     }
                 }
@@ -2358,20 +2377,24 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                 // We treat calls from a profile as if made by its parent as profiles
                 // share the accessibility state of the parent. The call below
                 // performs the current profile parent resolution.
+                Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......0");
                 final int resolvedUserId = mSecurityPolicy
                         .resolveCallingUserIdEnforcingPermissionsLocked(
                                 UserHandle.USER_CURRENT);
                 if (resolvedUserId != mCurrentUserId) {
+                    Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......1");
                     return false;
                 }
                 resolvedWindowId = resolveAccessibilityWindowIdLocked(accessibilityWindowId);
                 final boolean permissionGranted =
                     mSecurityPolicy.canGetAccessibilityNodeInfoLocked(this, resolvedWindowId);
                 if (!permissionGranted) {
+                    Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......2");
                     return false;
                 } else {
                     connection = getConnectionLocked(resolvedWindowId);
                     if (connection == null) {
+                        Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......3");
                         return false;
                     }
                 }
@@ -2388,6 +2411,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                 connection.findAccessibilityNodeInfoByAccessibilityId(accessibilityNodeId,
                         partialInteractiveRegion, interactionId, callback, mFetchFlags | flags,
                         interrogatingPid, interrogatingTid, spec);
+                Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......4");
                 return true;
             } catch (RemoteException re) {
                 if (DEBUG) {
@@ -2400,6 +2424,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                     partialInteractiveRegion.recycle();
                 }
             }
+            Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......5");
             return false;
         }
 
@@ -3335,7 +3360,11 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
 
         private boolean canDispatchAccessibilityEventLocked(AccessibilityEvent event) {
             final int eventType = event.getEventType();
+            Slog.i("XUJAY....", "canDispatchAccessibilityEventLocked(): eventType " + eventType);
             switch (eventType) {
+                // Added by XUJAY
+                case AccessibilityEvent.TYPE_VIEW_CLICKED:
+
                 // All events that are for changes in a global window
                 // state should *always* be dispatched.
                 case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
@@ -3362,6 +3391,8 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                 // the accessibility layer reports which are windows
                 // that a sighted user can touch.
                 default: {
+                    Slog.i("XUJAY....", "canDispatchAccessibilityEventLocked(): default return "
+                           + isRetrievalAllowingWindow(event.getWindowId()));
                     return isRetrievalAllowingWindow(event.getWindowId());
                 }
             }
@@ -3626,6 +3657,9 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
         }
 
         public boolean canGetAccessibilityNodeInfoLocked(Service service, int windowId) {
+            Slog.i("XUJAY....", "canGetAccessibilityNodeInfoLocked.....canRetrieveWindowContentLocked(service):"
+                   + canRetrieveWindowContentLocked(service) + ", isRetrievalAllowingWindow(windowId):"
+                   + isRetrievalAllowingWindow(windowId));
             return canRetrieveWindowContentLocked(service) && isRetrievalAllowingWindow(windowId);
         }
 
@@ -3696,6 +3730,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                     || userId == UserHandle.USER_CURRENT_OR_SELF);
         }
 
+        // TODO: XUJAY
         private boolean isRetrievalAllowingWindow(int windowId) {
             // The system gets to interact with any window it wants.
             if (Binder.getCallingUid() == Process.SYSTEM_UID) {
@@ -3703,6 +3738,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             }
             if (windowId == mActiveWindowId) {
                 return true;
+            }
+            Slog.i("XUJAY.....", "isRetrievalAllowingWindow..." + (findWindowById(windowId) != null));
+            if (windowId == 9) {
+                return true;  // TODO: XUJAY
             }
             return findWindowById(windowId) != null;
         }

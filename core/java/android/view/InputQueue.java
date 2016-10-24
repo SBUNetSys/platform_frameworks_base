@@ -18,6 +18,7 @@ package android.view;
 
 import dalvik.system.CloseGuard;
 
+import android.util.Log;
 import android.os.Looper;
 import android.os.MessageQueue;
 import android.util.Pools.Pool;
@@ -90,6 +91,9 @@ public final class InputQueue {
     /** @hide */
     public void sendInputEvent(InputEvent e, Object token, boolean predispatch,
             FinishedInputEventCallback callback) {
+
+        Log.i("XUJAY...", "InputQueue::sendInputEvent().........");
+
         ActiveInputEvent event = obtainActiveInputEvent(token, callback);
         long id;
         if (e instanceof KeyEvent) {

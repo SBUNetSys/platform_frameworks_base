@@ -28,6 +28,7 @@ import android.util.ArraySet;
 import android.util.LongArray;
 import android.util.Pools.SynchronizedPool;
 import android.view.View;
+import android.util.Log;
 
 import com.android.internal.R;
 
@@ -746,12 +747,14 @@ public class AccessibilityNodeInfo implements Parcelable {
     public boolean refresh(boolean bypassCache) {
         enforceSealed();
         if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            Log.i("XUJAY....", "!canPerformRequestOverConnection(mSourceNodeId)");
             return false;
         }
         AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
         AccessibilityNodeInfo refreshedInfo = client.findAccessibilityNodeInfoByAccessibilityId(
                 mConnectionId, mWindowId, mSourceNodeId, bypassCache, 0);
         if (refreshedInfo == null) {
+            Log.i("XUJAY....", "refreshedInfo == null");
             return false;
         }
         init(refreshedInfo);

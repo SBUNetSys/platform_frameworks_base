@@ -673,7 +673,7 @@ public class Activity extends ContextThemeWrapper
         OnCreateContextMenuListener, ComponentCallbacks2,
         Window.OnWindowDismissedCallback {
     private static final String TAG = "Activity";
-    private static final boolean DEBUG_LIFECYCLE = false;
+    private static final boolean DEBUG_LIFECYCLE = true;
 
     /** Standard activity result: operation canceled. */
     public static final int RESULT_CANCELED    = 0;
@@ -1615,11 +1615,18 @@ public class Activity extends ContextThemeWrapper
     @CallSuper
     protected void onStop() {
         if (DEBUG_LIFECYCLE) Slog.v(TAG, "onStop " + this);
-        if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(false);
-        mActivityTransitionState.onStop();
-        getApplication().dispatchActivityStopped(this);
-        mTranslucentCallback = null;
-        mCalled = true;
+        // XUJAY: HERE, try to add something
+        // if (this.toString().contains("Settings")) {
+        //     // Do nothing
+            
+        // } else
+        {
+            if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(false);
+            mActivityTransitionState.onStop();
+            getApplication().dispatchActivityStopped(this);
+            mTranslucentCallback = null;
+            mCalled = true;
+        }
     }
 
     /**

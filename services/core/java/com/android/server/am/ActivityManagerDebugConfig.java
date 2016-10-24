@@ -85,7 +85,9 @@ class ActivityManagerDebugConfig {
     static final boolean DEBUG_UID_OBSERVERS = DEBUG_ALL || false;
     static final boolean DEBUG_URI_PERMISSION = DEBUG_ALL || false;
     static final boolean DEBUG_USER_LEAVING = DEBUG_ALL || false;
-    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || false;
+    //XUJAY:    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || false;
+    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || true;
+    
     static final boolean DEBUG_VISIBLE_BEHIND = DEBUG_ALL_ACTIVITIES || false;
     static final boolean DEBUG_USAGE_STATS = DEBUG_ALL || false;
 
