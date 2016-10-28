@@ -7058,8 +7058,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         //noinspection ConstantConditions
         do {
             //Log.i("XUJAY....", "isShown() in package: " +  mContext.getPackageName());
-            if (mContext.getPackageName().contains("datepicker")) {
-                
+            String appName = mContext.getPackageName();
+            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+                    
             } else {
                 if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
                     return false;

@@ -95,7 +95,8 @@ final class AccessibilityInteractionController {
         return (view.mAttachInfo != null
                 && view.mAttachInfo.mWindowVisibility == View.VISIBLE
                 && view.isShown()) ||
-                (view.mAttachInfo != null && view.getPackageName().contains("datepicker"));
+                (view.mAttachInfo != null && WindowManagerGlobal.isActiveEvenInBackground(view.getPackageName()));
+        //view.getPackageName().contains("datepicker"));
     }
 
     public void findAccessibilityNodeInfoByAccessibilityIdClientThread(
@@ -1233,7 +1234,8 @@ final class AccessibilityInteractionController {
 
         @Override
         public boolean apply(View view) {
-            if (view.getPackageName().contains("datepicker")) {
+            String appName = view.getPackageName();
+            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
                 if (view.getId() == mViewId) {
                     Log.i("XUJAY....", "Predicate: apply mviewid " + mViewId);
                     mInfos.add(view.createAccessibilityNodeInfo());

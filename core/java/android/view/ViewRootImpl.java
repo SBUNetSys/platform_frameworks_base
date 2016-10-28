@@ -89,6 +89,7 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
+import android.util.ArraySet;
 
 /**
  * The top of a view hierarchy, implementing the needed protocol between View
@@ -1000,12 +1001,13 @@ public final class ViewRootImpl implements ViewParent,
 
     void setWindowStopped(boolean stopped) {
         // XUJAY: make the activity alive when the app is the Setting App
-        Log.i("XUJAY...", "setWindowStopped(): " + stopped + " packagename:" + mBasePackageName);
-        if (mBasePackageName != null && mBasePackageName.contains("datepicker")) {
+        Log.i("XUJAY..." + mBasePackageName, "setWindowStopped(): " + stopped + " packagename:" + mBasePackageName
+              + ", isActiveEvenInBackground(" + mBasePackageName + ")");
+
+        if (mBasePackageName != null && WindowManagerGlobal.isActiveEvenInBackground(mBasePackageName)) {
             mStopped = false;
             return;
         }
-
         if (mStopped != stopped) {
             mStopped = stopped;
             if (!mStopped) {
@@ -7051,6 +7053,15 @@ public final class ViewRootImpl implements ViewParent,
         AccessibilityInteractionConnection(ViewRootImpl viewRootImpl) {
             mViewRootImpl = new WeakReference<ViewRootImpl>(viewRootImpl);
         }
+
+        @Override
+        public void setAppBackgroundAlive(String appName) {
+            Log.i("XUJAY_API", "setAppBackgroundAlive");
+            ArraySet<String> bgApps = WindowManagerGlobal.getInstance().getBackgroundApps();
+            
+            
+        }
+
 
         @Override
         public void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId,

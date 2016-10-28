@@ -62,5 +62,7 @@ interface IAccessibilityServiceConnection {
 
     boolean performGlobalAction(int action);
 
+    boolean setAppBackgroundAlive(String appName);
+
     oneway void setOnKeyEventResult(boolean handled, int sequence);
 }

@@ -548,6 +548,10 @@ public final class AccessibilityInteractionClient
         sAccessibilityCache.onAccessibilityEvent(event);
     }
 
+    public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
+        sAccessibilityCache.onAccessibilityEvent(event);
+    }
+
     /**
      * Gets the the result of an async request that returns an {@link AccessibilityNodeInfo}.
      *

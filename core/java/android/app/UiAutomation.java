@@ -1017,6 +1017,23 @@ public final class UiAutomation {
                 }
 
                 @Override
+                public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
+                    // The pkgName hasn't been used yet
+                    synchronized (mLock) {
+                        mLastEventTimeMillis = event.getEventTime();
+                        if (mWaitingForEventDelivery) {
+                            mEventQueue.add(AccessibilityEvent.obtain(event));
+                        }
+                        mLock.notifyAll();
+                    }
+                    // Calling out only without a lock held.
+                    final OnAccessibilityEventListener listener = mOnAccessibilityEventListener;
+                    if (listener != null) {
+                        listener.onAccessibilityEvent(AccessibilityEvent.obtain(event));
+                    }
+                }
+
+                @Override
                 public boolean onKeyEvent(KeyEvent event) {
                     return false;
                 }

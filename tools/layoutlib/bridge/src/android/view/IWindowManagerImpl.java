@@ -80,6 +80,13 @@ public class IWindowManagerImpl implements IWindowManager {
     }
 
     @Override
+    public boolean isActiveEvenInBackground(String pkgName) {
+
+        return false;
+    }
+    
+
+    @Override
     public void addWindowToken(IBinder arg0, int arg1) throws RemoteException {
         // TODO Auto-generated method stub
 

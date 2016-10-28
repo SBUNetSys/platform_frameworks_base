@@ -358,6 +358,9 @@ public class WindowManagerService extends IWindowManager.Stub
      */
     final ArraySet<Session> mSessions = new ArraySet<>();
 
+    // XUJAY: keep track of background active apps by their names
+    final ArraySet<String> mBgActiveApps = new ArraySet<>();
+
     /**
      * Mapping from an IWindow IBinder to the server's Window object.
      * This is also used as the lock for all of our state.
@@ -3639,6 +3642,7 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         }
     }
+
 
     @Override
     public void removeWindowToken(IBinder token) {
@@ -8306,6 +8310,15 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     @Override
+    public boolean isActiveEvenInBackground(String pkgName) {
+        // TODO: XUJAY to add synchronize() around
+        boolean result = mBgActiveApps.contains(pkgName);
+        Slog.i("XUJAY_API", "WMS::isActiveEvenInBackground...result " + result);
+        return result;
+    }
+
+
+    @Override
     public boolean inputMethodClientHasFocus(IInputMethodClient client) {
         synchronized (mWindowMap) {
             // The focus for the client is the window immediately below
@@ -11863,6 +11876,19 @@ public class WindowManagerService extends IWindowManager.Stub
         @Override
         public void requestTraversalFromDisplayManager() {
             requestTraversal();
+        }
+
+        @Override
+        public void setAppBackgroundAlive(String appName) {
+            Slog.i("XUJAY_API", "WindowManagerService::setAppBackgroundAlive()...set "
+                   + appName + " into ArraySet " + ", size() " + mBgActiveApps.size()
+                   + ", contains(" + appName + "): " + mBgActiveApps.contains(appName));
+            mBgActiveApps.add(appName);
+        }
+
+        @Override
+        public ArraySet<String> getBackgroundApps() {
+            return mBgActiveApps;
         }
 
         @Override

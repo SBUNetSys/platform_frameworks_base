@@ -1292,6 +1292,7 @@ public class AccessibilityNodeInfo implements Parcelable {
      */
     public boolean performAction(int action) {
         enforceSealed();
+        Log.i("XUJAY....", "!canPerformRequestOverConnection(mSourceNodeId)" + !canPerformRequestOverConnection(mSourceNodeId));
         if (!canPerformRequestOverConnection(mSourceNodeId)) {
             return false;
         }

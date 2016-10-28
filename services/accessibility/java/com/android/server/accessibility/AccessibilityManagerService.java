@@ -2629,6 +2629,18 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
         }
 
         @Override
+        public boolean setAppBackgroundAlive(String appName) {
+            Slog.i(LOG_TAG, "setAppBackgroundAlive()");
+            // Set the app called 'appName' to be active even in the background
+            mWindowManagerService.setAppBackgroundAlive(appName);
+            
+
+
+            return true;
+        }
+        
+
+        @Override
         public void dump(FileDescriptor fd, final PrintWriter pw, String[] args) {
             mSecurityPolicy.enforceCallingPermission(Manifest.permission.DUMP, FUNCTION_DUMP);
             synchronized (mLock) {
@@ -2798,6 +2810,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
 
             try {
                 listener.onAccessibilityEvent(event);
+                listener.onAccessibilityEventForBackground("hahahahaha", event);
                 if (DEBUG) {
                     Slog.i(LOG_TAG, "Event " + event + " sent to " + listener);
                 }
@@ -3163,6 +3176,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                 mLock.notifyAll();
             }
         }
+
 
         private AccessibilityWindowInfo populateReportedWindow(WindowInfo window) {
             final int windowId = findWindowIdLocked(window.token);

@@ -111,6 +111,9 @@ public final class WindowManagerGlobal {
             new ArrayList<WindowManager.LayoutParams>();
     private final ArraySet<View> mDyingViews = new ArraySet<View>();
 
+    // XUJAY: keep track of background active apps by their names
+    private final ArraySet<String> mBgActiveApps = new ArraySet<String>();
+
     private Runnable mSystemPropertyUpdater;
 
     private WindowManagerGlobal() {
@@ -144,6 +147,22 @@ public final class WindowManagerGlobal {
             return sWindowManagerService;
         }
     }
+
+    public static boolean isActiveEvenInBackground(String pkgName) {
+        IWindowManager windowManager = getWindowManagerService();
+
+        boolean result = false;
+        synchronized (WindowManagerGlobal.class) {
+            try {
+                windowManager = getWindowManagerService();
+                result = windowManager.isActiveEvenInBackground(pkgName);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Failed to open window session", e);
+            }
+        }
+        return result;
+    }
+
 
     public static IWindowSession getWindowSession() {
         synchronized (WindowManagerGlobal.class) {
@@ -550,6 +569,14 @@ public final class WindowManagerGlobal {
                     root.setWindowStopped(stopped);
                 }
             }
+        }
+    }
+
+
+    public ArraySet<String> getBackgroundApps() {
+        synchronized (mLock) {
+            return null;
+
         }
     }
 
