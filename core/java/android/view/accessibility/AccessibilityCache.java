@@ -18,6 +18,7 @@ package android.view.accessibility;
 
 import android.os.Build;
 import android.util.ArraySet;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.util.LongArray;
 import android.util.LongSparseArray;
@@ -52,6 +53,10 @@ final class AccessibilityCache {
     private final SparseArray<AccessibilityWindowInfo> mTempWindowArray =
             new SparseArray<>();
 
+    // Created for UIWear
+    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
+    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
+
     public void addWindow(AccessibilityWindowInfo window) {
         synchronized (mLock) {
             if (DEBUG) {
@@ -64,6 +69,9 @@ final class AccessibilityCache {
                 oldWindow.recycle();
             }
             mWindowCache.put(windowId, AccessibilityWindowInfo.obtain(window));
+            
+            String appName = window.getRoot().getPackageName().toString();
+            mWindowIdCache.put(windowId, appName);
         }
     }
 
@@ -298,9 +306,11 @@ final class AccessibilityCache {
             int datepickerWindowId = -1;
             for (int i = windowCount - 1; i >= 0; i--) {
                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
+                final int windowId = mWindowCache.keyAt(i);
+                String appName = mWindowIdCache.get(windowId);
                 
-                if (mWindowCache.keyAt(i) == 9) {
-                    //Log.i("XUJAY....", "window package is " + window.getRoot().getPackageName());
+                if (appName != null && mBgActiveAppSet.contains(appName)) {
+                    Log.i("XUJAY....", "window package is " + window.getRoot().getPackageName());
                     datepickerWindowId = mWindowCache.keyAt(i);
                 } else {
                     Log.i("XUJAY....", "Now Remove window " + window);
@@ -348,6 +358,17 @@ final class AccessibilityCache {
      * Clears a subtree rooted at the node with the given id that is
      * hosted in a given window.
      *
+     * @param appName The name of the app that is active even on background.
+     */
+    public void addBackgroundAppRecord(String appName) {
+        mBgActiveAppSet.add(appName);
+    }
+
+
+    /**
+     * Clears a subtree rooted at the node with the given id that is
+     * hosted in a given window.
+     *
      * @param windowId The id of the hosting window.
      * @param rootNodeId The root id.
      */
@@ -356,7 +377,6 @@ final class AccessibilityCache {
             Log.i(LOG_TAG, "Clearing cached subtree. windowId: " + windowId
                   + " , rootNodeId: " + rootNodeId);
         }
-
         /////////////////////XUJAY//////////////////////
         {
             LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
@@ -367,7 +387,12 @@ final class AccessibilityCache {
             if (current == null) {
                 return;
             }
-            if (windowId == 9) {
+            // TODO: build a HashMap that is string=>windowId
+            String appName = current.getPackageName().toString();
+            if (appName == null) {
+                Log.e(LOG_TAG, "The app name is NULL in the AccessibilityNodeInfo.");
+
+            } else if (mBgActiveAppSet.contains(appName)) {
                 Log.i("XUJAY....", "Skip the clearSubTreeLocked");
                 return;
             }

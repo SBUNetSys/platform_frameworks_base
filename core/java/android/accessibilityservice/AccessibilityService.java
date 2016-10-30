@@ -406,8 +406,10 @@ public abstract class AccessibilityService extends Service {
      */
     public boolean setAppBackgroundAlive(String appName) {
         Log.d("XUJAY_API", "setAppBackgroundAlive");
-        IAccessibilityServiceConnection connection =
-                AccessibilityInteractionClient.getInstance().getConnection(mConnectionId);
+        AccessibilityInteractionClient interactionClient = AccessibilityInteractionClient.getInstance();
+        interactionClient.addBackgroundAppRecord(appName);
+
+        IAccessibilityServiceConnection connection = interactionClient.getConnection(mConnectionId);
         if (connection != null) {
             try {
                 return connection.setAppBackgroundAlive(appName);

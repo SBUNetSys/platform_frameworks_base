@@ -784,6 +784,16 @@ public final class AccessibilityInteractionClient
     }
 
     /**
+     * Add a background app record.
+     *
+     * @param appName The background app name.
+     */
+    public void addBackgroundAppRecord(String appName) {
+        sAccessibilityCache.addBackgroundAppRecord(appName);
+    }
+
+
+    /**
      * Checks whether the infos are a fully connected tree with no duplicates.
      *
      * @param infos The result list to check.
