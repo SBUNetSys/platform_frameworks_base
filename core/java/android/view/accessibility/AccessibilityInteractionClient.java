@@ -285,7 +285,7 @@ public final class AccessibilityInteractionClient
                         Log.i(LOG_TAG, "Node cache miss");
                     }
                 }
-                Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 1");
+                Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 1");
                 final int interactionId = mInteractionIdCounter.getAndIncrement();
                 final long identityToken = Binder.clearCallingIdentity();
                 final boolean success = connection.findAccessibilityNodeInfoByAccessibilityId(
@@ -294,12 +294,12 @@ public final class AccessibilityInteractionClient
                 Binder.restoreCallingIdentity(identityToken);
                 // If the scale is zero the call has failed.
                 if (success) {
-                    Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 2");
+                    Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 2");
                     List<AccessibilityNodeInfo> infos = getFindAccessibilityNodeInfosResultAndClear(
                             interactionId);
                     finalizeAndCacheAccessibilityNodeInfos(infos, connectionId);
                     if (infos != null && !infos.isEmpty()) {
-                        Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 3");
+                        Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 3");
                         return infos.get(0);
                     }
                 }

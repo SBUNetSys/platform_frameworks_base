@@ -70,8 +70,10 @@ final class AccessibilityCache {
             }
             mWindowCache.put(windowId, AccessibilityWindowInfo.obtain(window));
             
-            String appName = window.getRoot().getPackageName().toString();
-            mWindowIdCache.put(windowId, appName);
+            if (window.getRoot() != null && window.getRoot().getPackageName() != null) {
+                String appName = window.getRoot().getPackageName().toString();
+                mWindowIdCache.put(windowId, appName);
+            }
         }
     }
 
@@ -310,7 +312,7 @@ final class AccessibilityCache {
                 String appName = mWindowIdCache.get(windowId);
                 
                 if (appName != null && mBgActiveAppSet.contains(appName)) {
-                    Log.i("XUJAY....", "window package is " + window.getRoot().getPackageName());
+                    Log.i("XUJAY....", "window belongs to app " + appName);
                     datepickerWindowId = mWindowCache.keyAt(i);
                 } else {
                     Log.i("XUJAY....", "Now Remove window " + window);
@@ -361,7 +363,9 @@ final class AccessibilityCache {
      * @param appName The name of the app that is active even on background.
      */
     public void addBackgroundAppRecord(String appName) {
-        mBgActiveAppSet.add(appName);
+        synchronized (mLock) {
+            mBgActiveAppSet.add(appName);
+        }
     }
 
 
@@ -387,14 +391,12 @@ final class AccessibilityCache {
             if (current == null) {
                 return;
             }
-            // TODO: build a HashMap that is string=>windowId
-            String appName = current.getPackageName().toString();
-            if (appName == null) {
-                Log.e(LOG_TAG, "The app name is NULL in the AccessibilityNodeInfo.");
-
-            } else if (mBgActiveAppSet.contains(appName)) {
-                Log.i("XUJAY....", "Skip the clearSubTreeLocked");
-                return;
+            if (current.getPackageName() != null) {
+                String appName = current.getPackageName().toString();
+                if (mBgActiveAppSet.contains(appName)) {
+                    Log.i("XUJAY....", "Skip the clearSubTreeLocked");
+                    return;
+                }
             }
         }
         /////////////////////XUJAY//////////////////////
