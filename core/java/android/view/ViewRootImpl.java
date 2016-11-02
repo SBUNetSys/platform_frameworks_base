@@ -7011,6 +7011,7 @@ public final class ViewRootImpl implements ViewParent,
             if (!registered) {
                 mAttachInfo.mAccessibilityWindowId =
                         mAccessibilityManager.addAccessibilityInteractionConnection(mWindow,
+                                mBasePackageName,
                                 new AccessibilityInteractionConnection(ViewRootImpl.this));
             }
         }

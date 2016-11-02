@@ -67,6 +67,7 @@ import android.util.Pools.Pool;
 import android.util.Pools.SimplePool;
 import android.util.Slog;
 import android.util.SparseArray;
+import android.util.ArraySet;
 import android.view.Display;
 import android.view.IWindow;
 import android.view.InputDevice;
@@ -213,6 +214,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
     private boolean mInitialized;
 
     private WindowsForAccessibilityCallback mWindowsForAccessibilityCallback;
+
+    // Created for UIWear
+    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
+    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
 
     private UserState getCurrentUserStateLocked() {
         return getUserStateLocked(mCurrentUserId);
@@ -541,7 +546,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
     }
 
     @Override
-    public int addAccessibilityInteractionConnection(IWindow windowToken,
+    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
             IAccessibilityInteractionConnection connection, int userId) throws RemoteException {
         synchronized (mLock) {
             // We treat calls from a profile as if made by its parent as profiles
@@ -550,6 +555,12 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             final int resolvedUserId = mSecurityPolicy
                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
             final int windowId = sNextWindowId++;
+
+            // XUJAY: TODO change this, may crash
+            mWindowIdCache.put(windowId, appName);
+            Slog.i("XUJAY....", "addAccessibilityInteractionConnection " + windowId + ", " + appName);
+
+
             // If the window is from a process that runs across users such as
             // the system UI or the system we add it to the global state that
             // is shared across users.
@@ -2630,12 +2641,11 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
 
         @Override
         public boolean setAppBackgroundAlive(String appName) {
-            Slog.i(LOG_TAG, "setAppBackgroundAlive()");
             // Set the app called 'appName' to be active even in the background
             mWindowManagerService.setAppBackgroundAlive(appName);
-            
-
-
+            synchronized (mLock) {
+                mBgActiveAppSet.add(appName);
+            }
             return true;
         }
         
@@ -3743,8 +3753,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                     || userId == UserHandle.USER_CURRENT
                     || userId == UserHandle.USER_CURRENT_OR_SELF);
         }
-
-        // TODO: XUJAY
+        
         private boolean isRetrievalAllowingWindow(int windowId) {
             // The system gets to interact with any window it wants.
             if (Binder.getCallingUid() == Process.SYSTEM_UID) {
@@ -3753,9 +3762,14 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             if (windowId == mActiveWindowId) {
                 return true;
             }
-            Slog.i("XUJAY.....", "isRetrievalAllowingWindow..." + (findWindowById(windowId) != null));
-            if (windowId == 9) {
-                return true;  // TODO: XUJAY
+            // TODO: XUJAY
+            synchronized (mLock) {
+                String appName = mWindowIdCache.get(windowId);
+                Slog.i("XUJAY.....", "isRetrievalAllowingWindow: appName " + appName);
+                if (appName != null && mBgActiveAppSet.contains(appName)) {
+                    Slog.i("XUJAY.....", "This is a background app:" + appName + ", just skip checking it");
+                    return true;
+                }
             }
             return findWindowById(windowId) != null;
         }

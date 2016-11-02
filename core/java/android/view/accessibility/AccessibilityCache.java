@@ -305,17 +305,26 @@ final class AccessibilityCache {
                 Log.i(LOG_TAG, "clear()");
             }
             final int windowCount = mWindowCache.size();
-            int datepickerWindowId = -1;
+            int datepickerWindowId = -1;  /// TODO, change here....
+
+            Log.i("XUJAY....AccessibilityCache.clear", "mWindowIdCache.size() " + mWindowIdCache.size());
+            for (int i = 0; i < mWindowIdCache.size(); ++i) {
+                Log.i("XUJAY....AccessibilityCache.clear", "traversing "
+                      + i + "-th key=" + mWindowIdCache.keyAt(i)
+                      + " value=" + mWindowIdCache.valueAt(i));
+            }
+            
+            
             for (int i = windowCount - 1; i >= 0; i--) {
                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
                 final int windowId = mWindowCache.keyAt(i);
                 String appName = mWindowIdCache.get(windowId);
-                
                 if (appName != null && mBgActiveAppSet.contains(appName)) {
-                    Log.i("XUJAY....", "window belongs to app " + appName);
+                    Log.i("XUJAY....AccessibilityCache.clear", "window belongs to app " + appName
+                          + ", windowID: " + mWindowCache.keyAt(i));
                     datepickerWindowId = mWindowCache.keyAt(i);
                 } else {
-                    Log.i("XUJAY....", "Now Remove window " + window);
+                    Log.i("XUJAY....AccessibilityCache.clear", "Now Remove window " + window);
                     window.recycle();
                     mWindowCache.removeAt(i);
                 }

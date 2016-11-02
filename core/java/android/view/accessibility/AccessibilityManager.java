@@ -570,7 +570,7 @@ public final class AccessibilityManager {
      *
      * @hide
      */
-    public int addAccessibilityInteractionConnection(IWindow windowToken,
+    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
             IAccessibilityInteractionConnection connection) {
         final IAccessibilityManager service;
         final int userId;
@@ -582,7 +582,7 @@ public final class AccessibilityManager {
             userId = mUserId;
         }
         try {
-            return service.addAccessibilityInteractionConnection(windowToken, connection, userId);
+            return service.addAccessibilityInteractionConnection(windowToken, appName, connection, userId);
         } catch (RemoteException re) {
             Log.e(LOG_TAG, "Error while adding an accessibility interaction connection. ", re);
         }

@@ -261,7 +261,7 @@ public final class AccessibilityManager {
     private void setStateLocked(int stateFlags) {
     }
 
-    public int addAccessibilityInteractionConnection(IWindow windowToken,
+    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
             IAccessibilityInteractionConnection connection) {
         return View.NO_ID;
     }
