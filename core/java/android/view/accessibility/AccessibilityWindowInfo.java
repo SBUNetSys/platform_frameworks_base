@@ -85,16 +85,26 @@ public final class AccessibilityWindowInfo implements Parcelable {
     private LongArray mChildIds;
 
     private int mConnectionId = UNDEFINED;
-    private String mPackageName;  // To mark which app(package) this window belongs to.
+    private String mPackageName = "";  // To mark which app(package) this window belongs to.
 
     private AccessibilityWindowInfo() {
         /* do nothing - hide constructor */
     }
 
+    /**
+     * Gets the package name that the window belongs to.
+     *
+     * @return The package name string.
+     *
+     */
     public String getPackageName() {
         return mPackageName;
     }
 
+    /**
+     * Sets the package name that the window belongs to.
+     *
+     */
     public void setPackageName(String pkgName) {
         mPackageName = new String(pkgName);
     }
@@ -427,6 +437,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
         }
 
         parcel.writeInt(mConnectionId);
+        parcel.writeString(mPackageName);
     }
 
     private void initFromParcel(Parcel parcel) {
@@ -449,6 +460,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
         }
 
         mConnectionId = parcel.readInt();
+        mPackageName = parcel.readString();
     }
 
     @Override
@@ -501,6 +513,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
             builder.append(", hasChildren=").append(mChildIds != null
                     && mChildIds.size() > 0);
         }
+        builder.append(", packageName=" + mPackageName);
         builder.append(']');
         return builder.toString();
     }
@@ -519,6 +532,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
             mChildIds.clear();
         }
         mConnectionId = UNDEFINED;
+        mPackageName = "";
     }
 
     /**

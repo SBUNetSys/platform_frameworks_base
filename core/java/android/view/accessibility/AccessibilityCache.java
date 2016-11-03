@@ -70,11 +70,9 @@ final class AccessibilityCache {
             }
             mWindowCache.put(windowId, AccessibilityWindowInfo.obtain(window));
             
-            //if (window.getRoot() != null && window.getRoot().getPackageName() != null) {
             String appName = window.getPackageName();
             Log.i("XUJAY....", "window.getPackageName() is " + appName);
             mWindowIdCache.put(windowId, appName);
-                //}
         }
     }
 
