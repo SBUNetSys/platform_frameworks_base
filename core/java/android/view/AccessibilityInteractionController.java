@@ -96,7 +96,6 @@ final class AccessibilityInteractionController {
                 && view.mAttachInfo.mWindowVisibility == View.VISIBLE
                 && view.isShown()) ||
                 (view.mAttachInfo != null && WindowManagerGlobal.isActiveEvenInBackground(view.getPackageName()));
-        //view.getPackageName().contains("datepicker"));
     }
 
     public void findAccessibilityNodeInfoByAccessibilityIdClientThread(

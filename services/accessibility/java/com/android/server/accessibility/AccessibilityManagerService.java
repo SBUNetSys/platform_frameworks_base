@@ -556,10 +556,8 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
             final int windowId = sNextWindowId++;
 
-            // XUJAY: TODO change this, may crash
             mWindowIdCache.put(windowId, appName);
             Slog.i("XUJAY....", "addAccessibilityInteractionConnection " + windowId + ", " + appName);
-
 
             // If the window is from a process that runs across users such as
             // the system UI or the system we add it to the global state that
@@ -3201,6 +3199,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             reportedWindow.setLayer(window.layer);
             reportedWindow.setFocused(window.focused);
             reportedWindow.setBoundsInScreen(window.boundsInScreen);
+            String appName;
+            synchronized (mLock) {
+                appName = mWindowIdCache.get(windowId);
+            }
+            if (appName == null) {
+                appName = "";
+                Slog.w("XUJAY....", "Getting package name from windowId failed.");
+            } else {
+                Slog.d("XUJAY....", "Setting package name: " + appName);
+            }
+            reportedWindow.setPackageName(appName);
 
             final int parentId = findWindowIdLocked(window.parentToken);
             if (parentId >= 0) {

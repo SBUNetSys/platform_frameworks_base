@@ -85,9 +85,18 @@ public final class AccessibilityWindowInfo implements Parcelable {
     private LongArray mChildIds;
 
     private int mConnectionId = UNDEFINED;
+    private String mPackageName;  // To mark which app(package) this window belongs to.
 
     private AccessibilityWindowInfo() {
         /* do nothing - hide constructor */
+    }
+
+    public String getPackageName() {
+        return mPackageName;
+    }
+
+    public void setPackageName(String pkgName) {
+        mPackageName = new String(pkgName);
     }
 
     /**
@@ -364,6 +373,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
         infoClone.mId = info.mId;
         infoClone.mParentId = info.mParentId;
         infoClone.mBoundsInScreen.set(info.mBoundsInScreen);
+        infoClone.mPackageName = info.mPackageName;
 
         if (info.mChildIds != null && info.mChildIds.size() > 0) {
             if (infoClone.mChildIds == null) {
