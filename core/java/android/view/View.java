@@ -3255,7 +3255,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     /**
      * Briefly describes the view and is primarily used for accessibility support.
      */
-    private CharSequence mContentDescription;
+    private CharSequence mContentDescription = null;
 
     /**
      * Specifies the id of a view for which this view serves as a label for
@@ -3474,6 +3474,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     @ViewDebug.ExportedProperty(deepExport = true)
     protected Context mContext;
+
+    private AccessibilityNodeInfo mNodeInfo = null;
 
     private final Resources mResources;
 
@@ -6325,6 +6327,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         if (mAttachInfo == null) {
             return;
         }
+        // XUJAY: cache the AccessibilityNodeInfo, to provide to createSnapshot
+        mNodeInfo = info;
 
         Rect bounds = mAttachInfo.mTmpInvalRect;
 
@@ -6361,6 +6365,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 }
             }
         }
+
+        // Here comes to the code
+        info.setAccessibilityViewId(mAccessibilityViewId);
+        // XUJAY............................................................
 
         if (mLabelForId != View.NO_ID) {
             View rootView = getRootView();
@@ -15493,7 +15501,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * Create a snapshot of the view into a bitmap.  We should probably make
      * some form of this public, but should think about the API.
      */
-    Bitmap createSnapshot(Bitmap.Config quality, int backgroundColor, boolean skipChildren) {
+    public Bitmap createSnapshot(Bitmap.Config quality, int backgroundColor, boolean skipChildren) {
         int width = mRight - mLeft;
         int height = mBottom - mTop;
 
@@ -15563,6 +15571,14 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             attachInfo.mCanvas = canvas;
         }
 
+        Log.w("UIWear", "View.createSnapshot ....." + bitmap.getByteCount());
+        
+        String bitmapKey = mContext.getPackageName();
+        String descript = "";
+        if (getContentDescription() != null) {
+            descript = getContentDescription().toString();
+        }
+        Log.i("UIWear", bitmapKey + descript + ", setting bitmap count: " + bitmap.getByteCount());
         return bitmap;
     }
 

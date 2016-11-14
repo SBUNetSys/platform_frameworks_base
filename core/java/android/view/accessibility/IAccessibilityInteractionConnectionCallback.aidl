@@ -52,4 +52,6 @@ oneway interface IAccessibilityInteractionConnectionCallback {
      * @param interactionId The interaction id to match the result with the request.
      */
     void setPerformAccessibilityActionResult(boolean succeeded, int interactionId);
+
+    void setRequestSnapshotResult(boolean succeeded, int interactionId);
 }

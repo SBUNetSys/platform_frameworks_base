@@ -33,6 +33,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
@@ -7053,6 +7054,38 @@ public final class ViewRootImpl implements ViewParent,
                 }
             }
         }
+
+        @Override
+        public Bitmap requestSnapshot(long accessibilityNodeId, Bundle bundle, int interactionId,
+                                    IAccessibilityInteractionConnectionCallback callback, int flags,
+                                    int interrogatingPid, long interrogatingTid) {
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+
+            Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....BEGIN");
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....START");
+                // viewRootImpl.getAccessibilityInteractionController()
+                //         .requestSnapshotClientThread(accessibilityNodeId,
+                //                                      bundle, interactionId, callback, flags,
+                //                                      interrogatingPid, interrogatingTid);
+                return viewRootImpl.getAccessibilityInteractionController()
+                        .getSnapshot(accessibilityNodeId,
+                                     bundle, interactionId, callback, flags,
+                                     interrogatingPid, interrogatingTid);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    //callback.setFindAccessibilityNodeInfoResult(null, interactionId);
+                    Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....failed");
+                    callback.setRequestSnapshotResult(false, interactionId);
+
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+            return null;
+        }
+
 
         @Override
         public void findAccessibilityNodeInfosByViewId(long accessibilityNodeId,

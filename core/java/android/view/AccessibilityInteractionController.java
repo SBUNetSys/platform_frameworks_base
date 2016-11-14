@@ -19,6 +19,7 @@ package android.view;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,7 @@ import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
 
 import com.android.internal.os.SomeArgs;
 import com.android.internal.util.Predicate;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +59,7 @@ final class AccessibilityInteractionController {
 
     private final ArrayList<AccessibilityNodeInfo> mTempAccessibilityNodeInfoList =
         new ArrayList<AccessibilityNodeInfo>();
+
 
     private final Handler mHandler;
 
@@ -627,6 +630,126 @@ final class AccessibilityInteractionController {
         }
     }
 
+    public void requestSnapshotClientThread(long accessibilityNodeId, Bundle bundle, int interactionId,
+                                            IAccessibilityInteractionConnectionCallback callback, int flags,
+                                            int interogatingPid, long interrogatingTid) {
+        Message message = mHandler.obtainMessage();
+        message.what = PrivateHandler.MSG_REQUEST_SNAPSHOT;
+        message.arg1 = flags;
+        message.arg2 = AccessibilityNodeInfo.getAccessibilityViewId(accessibilityNodeId);
+        
+        SomeArgs args = SomeArgs.obtain();
+        args.argi1 = interactionId;
+        args.arg1 = bundle;
+        args.arg2 = callback;
+        
+        message.obj = args;
+
+        Log.i("SyncUI", "AccInteractionController.requestSnapshotClientThread.....");
+
+        // If the interrogation is performed by the same thread as the main UI
+        // thread in this process, set the message as a static reference so
+        // after this call completes the same thread but in the interrogating
+        // client can handle the message to generate the result.
+        if (interogatingPid == mMyProcessId && interrogatingTid == mMyLooperThreadId) {
+            AccessibilityInteractionClient.getInstanceForThread(
+                interrogatingTid).setSameThreadMessage(message);
+        } else {
+            Log.i("SyncUI", "AccInteractionController......sendMessage.....");
+            mHandler.sendMessage(message);
+        }
+    }
+
+
+    private void requestSnapshotUiThread(Message message) {
+        final int flags = message.arg1;
+        final int accessibilityViewId = message.arg2;
+
+        SomeArgs args = (SomeArgs) message.obj;
+        int interactionId = args.argi1;
+        Bundle bundle = (Bundle) args.arg1;
+        final IAccessibilityInteractionConnectionCallback callback =
+            (IAccessibilityInteractionConnectionCallback) args.arg2;
+        args.recycle();
+        
+        boolean succeeded = false;
+        try {
+            if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null) {
+                return;
+            }
+            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
+            View target = null;
+            if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+                target = findViewByAccessibilityId(accessibilityViewId);
+            } else {
+                target = mViewRootImpl.mView;
+            }
+            if (target != null && isShown(target)) {
+                AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
+                if (provider != null) {
+                    succeeded = false;  // has not support provider yet
+
+                } else {
+                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
+                    Bitmap bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
+                    String bitmapKey = "bitmap";
+                    bundle.putParcelable(bitmapKey, bitmap);
+                    succeeded = true;
+                }
+            }
+        } finally {
+            try {
+                mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
+                callback.setRequestSnapshotResult(succeeded, interactionId);
+
+            } catch (RemoteException re) {
+                /* ignore - the other side will time out */
+            }
+        }
+    }
+
+
+    public Bitmap getSnapshot(long accessibilityNodeId, Bundle bundle, int interactionId,
+                              IAccessibilityInteractionConnectionCallback callback, int flags,
+                              int interogatingPid, long interrogatingTid) {
+
+        Log.i("SyncUI", "AccInteractionController......getSnapshot.....");
+
+        final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(accessibilityNodeId);
+        Bitmap bitmap = null;
+        try {
+            if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null) {
+                return null;
+            }
+            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
+            View target = null;
+            if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+                Log.w("SyncUI", "accessibiityViewId != UNDEFINED_ITEM_ID. " + accessibilityViewId + " " + accessibilityNodeId);
+                target = findViewByAccessibilityId(accessibilityViewId);
+            } else {
+                Log.i("SyncUI", "use parent view");
+                target = mViewRootImpl.mView;
+            }
+            if (target != null && isShown(target)) {
+                AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
+                if (provider != null) {
+                    Log.i("SyncUI", "No provider yet");
+                    return null;
+                } else {
+                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
+                    bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
+                    String bitmapKey = "bitmap";
+                    bundle.putParcelable(bitmapKey, bitmap);
+                }
+            }
+        } finally {
+            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
+        }
+        return bitmap;
+    }
+
+
+
     private void performAccessibilityActionUiThread(Message message) {
         final int flags = message.arg1;
         final int accessibilityViewId = message.arg2;
@@ -1157,6 +1280,7 @@ final class AccessibilityInteractionController {
         private final static int MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_TEXT = 4;
         private final static int MSG_FIND_FOCUS = 5;
         private final static int MSG_FOCUS_SEARCH = 6;
+        private final static int MSG_REQUEST_SNAPSHOT = 7;
 
         public PrivateHandler(Looper looper) {
             super(looper);
@@ -1204,6 +1328,9 @@ final class AccessibilityInteractionController {
                 } break;
                 case MSG_FOCUS_SEARCH: {
                     focusSearchUiThread(message);
+                } break;
+                case MSG_REQUEST_SNAPSHOT: {
+                    requestSnapshotUiThread(message);
                 } break;
                 default:
                     throw new IllegalArgumentException("Unknown message type: " + type);

@@ -15,7 +15,7 @@
  */
 
 package android.accessibilityservice;
-
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.view.MagnificationSpec;
@@ -63,4 +63,9 @@ interface IAccessibilityServiceConnection {
     boolean performGlobalAction(int action);
 
     oneway void setOnKeyEventResult(boolean handled, int sequence);
+
+
+    Bitmap requestSnapshot(int windowId, long accessibilityNodeId, out Bundle bundle, int interactionId,
+                           IAccessibilityInteractionConnectionCallback callback, 
+                           long interrogatingTid);
 }

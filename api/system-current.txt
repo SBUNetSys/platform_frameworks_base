@@ -38186,6 +38186,7 @@ package android.view {
     method protected int computeVerticalScrollRange();
     method public android.view.accessibility.AccessibilityNodeInfo createAccessibilityNodeInfo();
     method public void createContextMenu(android.view.ContextMenu);
+    method public android.graphics.Bitmap createSnapshot(android.graphics.Bitmap.Config, int, boolean);
     method public void destroyDrawingCache();
     method public android.view.WindowInsets dispatchApplyWindowInsets(android.view.WindowInsets);
     method public void dispatchConfigurationChanged(android.content.res.Configuration);
@@ -39864,6 +39865,7 @@ package android.view.accessibility {
     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo> findAccessibilityNodeInfosByViewId(java.lang.String);
     method public android.view.accessibility.AccessibilityNodeInfo findFocus(int);
     method public android.view.accessibility.AccessibilityNodeInfo focusSearch(int);
+    method public int getAccessibilityViewId();
     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction> getActionList();
     method public deprecated int getActions();
     method public void getBoundsInParent(android.graphics.Rect);
@@ -39890,6 +39892,7 @@ package android.view.accessibility {
     method public int getTextSelectionStart();
     method public android.view.accessibility.AccessibilityNodeInfo getTraversalAfter();
     method public android.view.accessibility.AccessibilityNodeInfo getTraversalBefore();
+    method public android.view.View getView();
     method public java.lang.String getViewIdResourceName();
     method public android.view.accessibility.AccessibilityWindowInfo getWindow();
     method public int getWindowId();
@@ -39922,7 +39925,9 @@ package android.view.accessibility {
     method public boolean removeAction(android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction);
     method public boolean removeChild(android.view.View);
     method public boolean removeChild(android.view.View, int);
+    method public android.graphics.Bitmap requestSnapshot(android.os.Bundle);
     method public void setAccessibilityFocused(boolean);
+    method public void setAccessibilityViewId(int);
     method public void setBoundsInParent(android.graphics.Rect);
     method public void setBoundsInScreen(android.graphics.Rect);
     method public void setCanOpenPopup(boolean);
@@ -39966,6 +39971,7 @@ package android.view.accessibility {
     method public void setTraversalAfter(android.view.View, int);
     method public void setTraversalBefore(android.view.View);
     method public void setTraversalBefore(android.view.View, int);
+    method public void setView(android.view.View);
     method public void setViewIdResourceName(java.lang.String);
     method public void setVisibleToUser(boolean);
     method public void writeToParcel(android.os.Parcel, int);
