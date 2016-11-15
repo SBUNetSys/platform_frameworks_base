@@ -52,7 +52,7 @@ public class DumpCommand extends Command {
     @Override
     public String detailedOptions() {
         return "    dump [--verbose][file]\n"
-            + "      [--compressed]: dumps compressed layout information.\n"
+            + "      [--compressed]: dumps compressed layout information. XUJAY......\n"
             + "      [file]: the location where the dumped XML should be stored, default is\n      "
             + DEFAULT_DUMP_FILE.getAbsolutePath() + "\n";
     }

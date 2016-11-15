@@ -139,6 +139,12 @@ public abstract class MockAccessibilityService extends AccessibilityService {
     }
 
     @Override
+    public void onAccessibilityEventForBackground(String appName, AccessibilityEvent receivedEvent) {
+
+
+    }
+
+    @Override
     public void onInterrupt() {
         if (!mReplaying) {
             return;

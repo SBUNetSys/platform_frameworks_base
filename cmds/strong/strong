@@ -1,0 +1,6 @@
+# Script to start "strong" on the device  
+#  
+#
+base=/system
+export CLASSPATH=$base/framework/strong.jar
+exec app_process $base/bin com.android.commands.strong.strong "$@"

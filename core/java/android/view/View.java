@@ -6344,6 +6344,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         getBoundsOnScreen(bounds, true);
         info.setBoundsInScreen(bounds);
 
+        Log.i("SyncUI", "...Init AccNodeInfo id is " + mAccessibilityViewId);
+        info.setAccessibilityViewId(mAccessibilityViewId);
+
         ViewParent parent = getParentForAccessibility();
         if (parent instanceof View) {
             info.setParent((View) parent);
@@ -15598,6 +15601,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             // Restore the cached Canvas for our siblings
             attachInfo.mCanvas = canvas;
         }
+        Log.i("UIWear_View", "Setting bitmap.getByteCount: " + bitmap.getByteCount());
 
         return bitmap;
     }

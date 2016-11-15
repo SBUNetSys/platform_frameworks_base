@@ -43,6 +43,7 @@ import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.graphics.Bitmap;
 import android.hardware.display.DisplayManager;
 import android.hardware.input.InputManager;
 import android.net.Uri;
@@ -2595,6 +2596,57 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             }
             return true;
         }
+
+        @Override
+        public Bitmap requestSnapshot(int accessibilityWindowId,
+                                    long accessibilityNodeId, Bundle bundle, int interactionId,
+                                    IAccessibilityInteractionConnectionCallback callback,
+                                    long interrogatingTid) {
+            Slog.i("SyncUI", "RequestSnapshot, AccessibilityManagerService.BEGIN.......");
+            final int resolvedWindowId;
+            IAccessibilityInteractionConnection connection = null;
+            Bitmap bitmap = null;
+            synchronized (mLock) {
+                // We treat calls from a profile as if made by its parent as profiles
+                // share the accessibility state of the parent. The call below
+                // performs the current profile parent resolution.
+                final int resolvedUserId = mSecurityPolicy
+                        .resolveCallingUserIdEnforcingPermissionsLocked(
+                                UserHandle.USER_CURRENT);
+                if (resolvedUserId != mCurrentUserId) {
+                    Slog.w("SyncUI", " AccessibilityManagerService....Wrong userId..");
+                    return null;
+                }
+                resolvedWindowId = resolveAccessibilityWindowIdLocked(accessibilityWindowId);
+                final boolean permissionGranted = mSecurityPolicy.canGetAccessibilityNodeInfoLocked(
+                    this, resolvedWindowId);
+                if (!permissionGranted) {
+                    Slog.w("SyncUI", " AccessibilityManagerService....permission Denied..");
+                    return null;
+                } else {
+                    connection = getConnectionLocked(resolvedWindowId);
+                    if (connection == null) {
+                        Slog.w("SyncUI", " AccessibilityManagerService....getConnectionLocked failed..");
+                        return null;
+                    }
+                }
+            }
+            final int interrogatingPid = Binder.getCallingPid();
+            final long identityToken = Binder.clearCallingIdentity();
+            try {
+                Slog.w("SyncUI", " AccessibilityManagerService.requestSnapshot.....");
+                bitmap = connection.requestSnapshot(accessibilityNodeId, bundle, interactionId, callback,
+                                                    mFetchFlags, interrogatingPid, interrogatingTid);
+            } catch (RemoteException re) {
+                if (DEBUG) {
+                    Slog.e(LOG_TAG, "Error calling requestSnapshot()");
+                }
+            } finally {
+                Binder.restoreCallingIdentity(identityToken);
+            }
+            return bitmap;
+        }
+
 
         @Override
         public boolean performGlobalAction(int action) {

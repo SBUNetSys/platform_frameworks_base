@@ -24,6 +24,7 @@ import android.os.Message;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
@@ -540,6 +541,34 @@ public final class AccessibilityInteractionClient
         return false;
     }
 
+    /**
+     * XUJAY:
+     * request for the snapshot of current node
+     *
+     */
+    public Bitmap requestSnapshot(int connectionId, int accessibilityWindowId,
+                                long accessibilityNodeId, Bundle bundle) {
+        try {
+            IAccessibilityServiceConnection connection = getConnection(connectionId);
+            if (connection != null) {
+                final int interactionId = mInteractionIdCounter.getAndIncrement();
+                long tid = Thread.currentThread().getId();
+                Log.i("SyncUI", "RequestSnapshot, AccessibilityInteractionClient........");
+                return connection.requestSnapshot(accessibilityWindowId, accessibilityNodeId,
+                                                  bundle, interactionId, this, tid);
+
+            } else {
+                if (DEBUG) {
+                    Log.w(LOG_TAG, "No connection for connection id: " + connectionId);
+                }
+            }
+        } catch (RemoteException re) {
+            Log.w(LOG_TAG, "Error while calling remote requestSnapshot", re);
+        }
+        return null;
+    }
+
+
     public void clearCache() {
         sAccessibilityCache.clear();
     }
@@ -667,6 +696,18 @@ public final class AccessibilityInteractionClient
         mFindAccessibilityNodeInfosResult = null;
         mPerformAccessibilityActionResult = false;
     }
+
+
+    public void setRequestSnapshotResult(boolean succeeded, int interactionId) {
+        synchronized (mInstanceLock) {
+            if (interactionId > mInteractionId) {
+
+                mInteractionId = interactionId;
+            }
+            mInstanceLock.notifyAll();
+        }
+    }
+
 
     /**
      * Waits up to a given bound for a result of a request and returns it.

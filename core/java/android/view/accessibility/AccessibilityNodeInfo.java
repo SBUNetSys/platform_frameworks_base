@@ -19,6 +19,7 @@ package android.view.accessibility;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.Nullable;
 import android.graphics.Rect;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -536,6 +537,20 @@ public class AccessibilityNodeInfo implements Parcelable {
     private static final int VIRTUAL_DESCENDANT_ID_SHIFT = 32;
 
     /**
+     * XUJAY:
+     * The stable ID of this view for accessibility purposes.
+     */
+    private int mAccessibilityViewId = -1;
+
+    public void setAccessibilityViewId(int nodeId) {
+        mAccessibilityViewId = nodeId;
+    }
+
+    public int getAccessibilityViewId() {
+        return mAccessibilityViewId;
+    }
+
+    /**
      * Gets the accessibility view id which identifies a View in the view three.
      *
      * @param accessibilityNodeId The id of an {@link AccessibilityNodeInfo}.
@@ -629,11 +644,22 @@ public class AccessibilityNodeInfo implements Parcelable {
     private CollectionInfo mCollectionInfo;
     private CollectionItemInfo mCollectionItemInfo;
 
+    // XUJAY: added for createSnapshot
+    private View mView;
+
     /**
      * Hide constructor from clients.
      */
     private AccessibilityNodeInfo() {
         /* do nothing */
+    }
+
+    public void setView(View view) {
+        mView = view;
+    }
+
+    public View getView() {
+        return mView;
     }
 
     /**
@@ -1323,6 +1349,26 @@ public class AccessibilityNodeInfo implements Parcelable {
         return client.performAccessibilityAction(mConnectionId, mWindowId, mSourceNodeId,
                 action, arguments);
     }
+
+
+    /**
+     * XUJAY:
+     * request for the snapshot of current node
+     *
+     */
+    public Bitmap requestSnapshot(Bundle bundle) {
+        if (bundle == null) {
+            return null;
+        }
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return null;
+        }
+        Log.i("SyncUI", "RequestSnapshot, AccessibilityNodeInfo......." + mAccessibilityViewId);
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.requestSnapshot(mConnectionId, mWindowId, mAccessibilityViewId, bundle);
+    }
+
 
     /**
      * Finds {@link AccessibilityNodeInfo}s by text. The match is case
@@ -2640,6 +2686,7 @@ public class AccessibilityNodeInfo implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(mAccessibilityViewId);
         parcel.writeInt(isSealed() ? 1 : 0);
         parcel.writeLong(mSourceNodeId);
         parcel.writeInt(mWindowId);
@@ -2762,6 +2809,7 @@ public class AccessibilityNodeInfo implements Parcelable {
      * @param other The other instance.
      */
     private void init(AccessibilityNodeInfo other) {
+        mAccessibilityViewId = other.mAccessibilityViewId;  // XUJAY
         mSealed = other.mSealed;
         mSourceNodeId = other.mSourceNodeId;
         mParentNodeId = other.mParentNodeId;
@@ -2825,6 +2873,7 @@ public class AccessibilityNodeInfo implements Parcelable {
      * @param parcel A parcel containing the state of a {@link AccessibilityNodeInfo}.
      */
     private void initFromParcel(Parcel parcel) {
+        mAccessibilityViewId = parcel.readInt();
         final boolean sealed = (parcel.readInt()  == 1);
         mSourceNodeId = parcel.readLong();
         mWindowId = parcel.readInt();
@@ -2923,6 +2972,7 @@ public class AccessibilityNodeInfo implements Parcelable {
      * Clears the state of this instance.
      */
     private void clear() {
+        mAccessibilityViewId = -1;
         mSealed = false;
         mSourceNodeId = ROOT_NODE_ID;
         mParentNodeId = ROOT_NODE_ID;
@@ -2940,7 +2990,7 @@ public class AccessibilityNodeInfo implements Parcelable {
         mBoundsInParent.set(0, 0, 0, 0);
         mBoundsInScreen.set(0, 0, 0, 0);
         mBooleanProperties = 0;
-        mPackageName = null;
+
         mClassName = null;
         mText = null;
         mError = null;
@@ -2954,8 +3004,14 @@ public class AccessibilityNodeInfo implements Parcelable {
         mInputType = InputType.TYPE_NULL;
         mLiveRegion = View.ACCESSIBILITY_LIVE_REGION_NONE;
         if (mExtras != null) {
+            Bitmap bitmap = (Bitmap) mExtras.get(mPackageName.toString());
+            if (bitmap != null) {
+                bitmap.recycle();
+                bitmap = null;
+            }
             mExtras.clear();
         }
+        mPackageName = null;
         if (mRangeInfo != null) {
             mRangeInfo.recycle();
             mRangeInfo = null;

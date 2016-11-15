@@ -62,4 +62,9 @@ public class AELogger extends AccessibilityService {
             toast.show();
         }
     }
+
+    @Override
+    public void onAccessibilityEventForBackground(String appName, AccessibilityEvent event) {
+
+    }
 }

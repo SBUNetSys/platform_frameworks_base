@@ -40,7 +40,7 @@ public class EventsCommand extends Command {
 
     @Override
     public String shortHelp() {
-        return "prints out accessibility events until terminated";
+        return "prints out accessibility events until terminated.....XUJAY.........";
     }
 
     @Override

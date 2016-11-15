@@ -18,6 +18,7 @@ package android.accessibilityservice;
 
 import android.os.Bundle;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.graphics.Bitmap;
 import android.view.MagnificationSpec;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
@@ -65,4 +66,8 @@ interface IAccessibilityServiceConnection {
     boolean setAppBackgroundAlive(String appName);
 
     oneway void setOnKeyEventResult(boolean handled, int sequence);
+
+    Bitmap requestSnapshot(int windowId, long accessibilityNodeId, out Bundle bundle, int interactionId,
+                           IAccessibilityInteractionConnectionCallback callback, 
+                           long interrogatingTid);
 }

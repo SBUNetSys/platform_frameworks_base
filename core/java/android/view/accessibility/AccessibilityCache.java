@@ -313,7 +313,6 @@ final class AccessibilityCache {
                       + " value=" + mWindowIdCache.valueAt(i));
             }
             
-            
             for (int i = windowCount - 1; i >= 0; i--) {
                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
                 final int windowId = mWindowCache.keyAt(i);
