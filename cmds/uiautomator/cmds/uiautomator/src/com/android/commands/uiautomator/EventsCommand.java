@@ -56,10 +56,14 @@ public class EventsCommand extends Command {
                 new OnAccessibilityEventListener() {
             @Override
             public void onAccessibilityEvent(AccessibilityEvent event) {
+                System.out.println(event.getPackageName());
+
                 SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
                 System.out.println(String.format("%s %s",
                         formatter.format(new Date()), event.toString()));
+
             }
+
         });
         // there's really no way to stop, essentially we just block indefinitely here and wait
         // for user to press Ctrl+C

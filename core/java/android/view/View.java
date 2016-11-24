@@ -5208,6 +5208,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final ListenerInfo li = mListenerInfo;
         if (li != null && li.mOnClickListener != null) {
             playSoundEffect(SoundEffectConstants.CLICK);
+            Log.i("XUJAY_API", this.toString());
             li.mOnClickListener.onClick(this);
             result = true;
         } else {

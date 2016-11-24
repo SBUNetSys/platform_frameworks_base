@@ -38,7 +38,7 @@ public final class strong {
 
         printUsage();
         System.err.println("Wellcom strong test function!!");
-
+     
         try {
             new strong().run();
         } catch (Exception e) {

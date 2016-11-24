@@ -650,8 +650,6 @@ final class AccessibilityInteractionController {
         
         message.obj = args;
 
-        Log.i("SyncUI", "AccInteractionController.requestSnapshotClientThread.....");
-
         // If the interrogation is performed by the same thread as the main UI
         // thread in this process, set the message as a static reference so
         // after this call completes the same thread but in the interrogating
@@ -660,7 +658,6 @@ final class AccessibilityInteractionController {
             AccessibilityInteractionClient.getInstanceForThread(
                 interrogatingTid).setSameThreadMessage(message);
         } else {
-            Log.i("SyncUI", "AccInteractionController......sendMessage.....");
             mHandler.sendMessage(message);
         }
     }
@@ -737,10 +734,8 @@ final class AccessibilityInteractionController {
             if (target != null && isShown(target)) {
                 AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
                 if (provider != null) {
-                    Log.i("SyncUI", "No provider yet");
                     return null;
                 } else {
-                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
                     bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
                     String bitmapKey = "bitmap";
                     bundle.putParcelable(bitmapKey, bitmap);
@@ -768,11 +763,13 @@ final class AccessibilityInteractionController {
         args.recycle();
 
         boolean succeeded = false;
+        Log.i("XUJAY_API", "performAccessibilityActionUiThread.....1");
         try {
             if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null ||
                     mViewRootImpl.mStopped || mViewRootImpl.mPausedForTransition) {
                 return;
             }
+            Log.i("XUJAY_API", "performAccessibilityActionUiThread.....2");
             mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
             View target = null;
             if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
@@ -781,6 +778,7 @@ final class AccessibilityInteractionController {
                 target = mViewRootImpl.mView;
             }
             if (target != null && isShown(target)) {
+                Log.i("XUJAY_API", "performAccessibilityActionUiThread.....3");
                 AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
                 if (provider != null) {
                     if (virtualDescendantId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
@@ -791,6 +789,7 @@ final class AccessibilityInteractionController {
                                 action, arguments);
                     }
                 } else if (virtualDescendantId == AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+                    Log.i("XUJAY_API", "performAccessibilityActionUiThread.....4");
                     succeeded = target.performAccessibilityAction(action, arguments);
                 }
             }
