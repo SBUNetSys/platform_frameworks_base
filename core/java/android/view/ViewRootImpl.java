@@ -90,7 +90,8 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
-
+import android.util.ArraySet;
+import android.graphics.Bitmap;
 /**
  * The top of a view hierarchy, implementing the needed protocol between View
  * and the WindowManager.  This is for the most part an internal implementation
@@ -992,6 +993,14 @@ public final class ViewRootImpl implements ViewParent,
     }
 
     void setWindowStopped(boolean stopped) {
+        Log.i("XUJAY..." + mBasePackageName, "setWindowStopped(): " + stopped + " packagename:" + mBasePackageName
+              + ", isActiveEvenInBackground(" + mBasePackageName + ")");
+
+        if (mBasePackageName != null && WindowManagerGlobal.isActiveEvenInBackground(mBasePackageName)) {
+            mStopped = false;
+            return;
+        }
+
         if (mStopped != stopped) {
             mStopped = stopped;
             if (!mStopped) {
@@ -6971,6 +6980,7 @@ public final class ViewRootImpl implements ViewParent,
             if (!registered) {
                 mAttachInfo.mAccessibilityWindowId =
                         mAccessibilityManager.addAccessibilityInteractionConnection(mWindow,
+                                                                                    mBasePackageName,
                                 new AccessibilityInteractionConnection(ViewRootImpl.this));
             }
         }
@@ -7012,6 +7022,12 @@ public final class ViewRootImpl implements ViewParent,
 
         AccessibilityInteractionConnection(ViewRootImpl viewRootImpl) {
             mViewRootImpl = new WeakReference<ViewRootImpl>(viewRootImpl);
+        }
+
+        @Override
+        public void setAppBackgroundAlive(String appName) {
+            Log.i("XUJAY_API", "setAppBackgroundAlive");
+            ArraySet<String> bgApps = WindowManagerGlobal.getInstance().getBackgroundApps();
         }
 
         @Override

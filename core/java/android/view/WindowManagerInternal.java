@@ -23,6 +23,7 @@ import android.os.IBinder;
 import android.view.animation.Animation;
 
 import java.util.List;
+import android.util.ArraySet;
 
 /**
  * Window manager local system service interface.
@@ -170,6 +171,19 @@ public abstract class WindowManagerInternal {
      */
     public abstract void setWindowsForAccessibilityCallback(
             WindowsForAccessibilityCallback callback);
+
+    /**
+     * Set the specified app to be active even in background status.
+     *
+     * @param appName The name of the app to be background.
+     */
+    public abstract void setAppBackgroundAlive(String appName);
+
+    /**
+     * Return the apps list that are in background.
+     *
+     */
+    public abstract ArraySet<String> getBackgroundApps();
 
     /**
      * Sets a filter for manipulating the input event stream.

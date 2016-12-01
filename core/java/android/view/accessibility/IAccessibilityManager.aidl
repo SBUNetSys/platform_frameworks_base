@@ -45,7 +45,7 @@ interface IAccessibilityManager {
 
     void interrupt(int userId);
 
-    int addAccessibilityInteractionConnection(IWindow windowToken,
+    int addAccessibilityInteractionConnection(IWindow windowToken, String appName, 
         in IAccessibilityInteractionConnection connection, int userId);
 
     void removeAccessibilityInteractionConnection(IWindow windowToken);

@@ -1016,6 +1016,12 @@ public final class UiAutomation {
                     }
                 }
 
+		@Override
+		public void onAccessibilityEventForBackground(String a, AccessibilityEvent b)
+		{
+
+		}
+
                 @Override
                 public boolean onKeyEvent(KeyEvent event) {
                     return false;

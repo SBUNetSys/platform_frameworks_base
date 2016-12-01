@@ -19,6 +19,7 @@ package android.view.accessibility;
 import android.os.Build;
 import android.util.ArraySet;
 import android.util.Log;
+import android.util.ArrayMap;
 import android.util.LongArray;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
@@ -52,6 +53,10 @@ final class AccessibilityCache {
     private final SparseArray<AccessibilityWindowInfo> mTempWindowArray =
             new SparseArray<>();
 
+    // Created for UIWear
+    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
+    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
+
     public void addWindow(AccessibilityWindowInfo window) {
         synchronized (mLock) {
             if (DEBUG) {
@@ -63,6 +68,9 @@ final class AccessibilityCache {
                 oldWindow.recycle();
             }
             mWindowCache.put(windowId, AccessibilityWindowInfo.obtain(window));
+            String appName = window.getPackageName();
+            Log.i("XUJAY....", "window.getPackageName() is " + appName);
+            mWindowIdCache.put(windowId, appName);
         }
     }
 
@@ -281,15 +289,35 @@ final class AccessibilityCache {
                 Log.i(LOG_TAG, "clear()");
             }
             final int windowCount = mWindowCache.size();
+
+            int datepickerWindowId = -1;  /// TODO, change here....
+            Log.i("XUJAY....AccessibilityCache.clear", "mWindowIdCache.size() " + mWindowIdCache.size());
+            for (int i = 0; i < mWindowIdCache.size(); ++i) {
+                Log.i("XUJAY....AccessibilityCache.clear", "traversing "
+                      + i + "-th key=" + mWindowIdCache.keyAt(i)
+                      + " value=" + mWindowIdCache.valueAt(i));
+            }
+
             for (int i = windowCount - 1; i >= 0; i--) {
                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
-                window.recycle();
-                mWindowCache.removeAt(i);
+
+                final int windowId = mWindowCache.keyAt(i);
+                String appName = mWindowIdCache.get(windowId);
+                if (appName != null && mBgActiveAppSet.contains(appName)) {
+                    Log.i("XUJAY....AccessibilityCache.clear", "window belongs to app " + appName
+                          + ", windowID: " + mWindowCache.keyAt(i));
+                     datepickerWindowId = mWindowCache.keyAt(i);
+                } else {
+                    window.recycle();
+                    mWindowCache.removeAt(i);
+                }
             }
             final int nodesForWindowCount = mNodeCache.size();
             for (int i = 0; i < nodesForWindowCount; i++) {
                 final int windowId = mNodeCache.keyAt(i);
-                clearNodesForWindowLocked(windowId);
+                if (windowId != datepickerWindowId) {
+                    clearNodesForWindowLocked(windowId);
+                }
             }
 
             mAccessibilityFocus = AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
@@ -316,6 +344,15 @@ final class AccessibilityCache {
     }
 
     /**
+     * @param appName The name of the app that is active even on background.
+     */
+    public void addBackgroundAppRecord(String appName) {
+        synchronized (mLock) {
+            mBgActiveAppSet.add(appName);
+        }
+    }
+
+    /**
      * Clears a subtree rooted at the node with the given id that is
      * hosted in a given window.
      *
@@ -326,10 +363,31 @@ final class AccessibilityCache {
         if (DEBUG) {
             Log.i(LOG_TAG, "Clearing cached subtree.");
         }
+        /////////////////////XUJAY//////////////////////
+        {
+            LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
+            if (nodes == null) {
+                return;
+            }
+            AccessibilityNodeInfo current = nodes.get(rootNodeId);
+            if (current == null) {
+                return;
+            }
+            if (current.getPackageName() != null) {
+                String appName = current.getPackageName().toString();
+                if (mBgActiveAppSet.contains(appName)) {
+                    Log.i("XUJAY....", "Skip the clearSubTreeLocked");
+                    return;
+                }
+            }
+        }
+        /////////////////////XUJAY//////////////////////
+
         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
         if (nodes != null) {
             clearSubTreeRecursiveLocked(nodes, rootNodeId);
         }
+
     }
 
     /**
@@ -345,6 +403,7 @@ final class AccessibilityCache {
         if (current == null) {
             return;
         }
+
         nodes.remove(rootNodeId);
         final int childCount = current.getChildCount();
         for (int i = 0; i < childCount; i++) {

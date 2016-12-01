@@ -96,7 +96,9 @@ final class AccessibilityInteractionController {
         // tree traversal.
         return (view.mAttachInfo != null
                 && view.mAttachInfo.mWindowVisibility == View.VISIBLE
-                && view.isShown());
+                && view.isShown())
+                ||
+                (view.mAttachInfo != null && WindowManagerGlobal.isActiveEvenInBackground(view.getPackageName()));
     }
 
     public void findAccessibilityNodeInfoByAccessibilityIdClientThread(
@@ -1354,10 +1356,42 @@ final class AccessibilityInteractionController {
 
         @Override
         public boolean apply(View view) {
-            if (view.getId() == mViewId && isShown(view)) {
-                mInfos.add(view.createAccessibilityNodeInfo());
+            String appName = view.getPackageName();
+            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+                if (view.getId() == mViewId) {
+                    mInfos.add(view.createAccessibilityNodeInfo());
+                }
+            } else {
+                if (view.getId() == mViewId && isShown(view)) {
+                    mInfos.add(view.createAccessibilityNodeInfo());
+                }
             }
+            
             return false;
         }
     }
+
+    private final class UIWearAddNodeInfosForViewId implements Predicate<View> {
+        private int mViewId = View.NO_ID;
+        private List<AccessibilityNodeInfo> mInfos;
+
+        public void init(int viewId, List<AccessibilityNodeInfo> infos) {
+            mViewId = viewId;
+            mInfos = infos;
+        }
+
+        public void reset() {
+            mViewId = View.NO_ID;
+            mInfos = null;
+        }
+
+        // Comparing to AddNodeInfosForViewId, the only difference is this function
+        @Override
+        public boolean apply(View view) {
+            if (view.getId() == mViewId) {
+                 mInfos.add(view.createAccessibilityNodeInfo());
+             }
+             return false;
+         }
+     }
 }

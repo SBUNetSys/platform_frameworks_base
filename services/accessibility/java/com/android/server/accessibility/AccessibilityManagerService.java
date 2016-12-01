@@ -95,7 +95,7 @@ import com.android.internal.content.PackageMonitor;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.server.LocalServices;
-
+import android.util.ArraySet;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.FileDescriptor;
@@ -215,6 +215,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
     private boolean mInitialized;
 
     private WindowsForAccessibilityCallback mWindowsForAccessibilityCallback;
+
+    // Created for UIWear
+    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
+    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
 
     private UserState getCurrentUserStateLocked() {
         return getUserStateLocked(mCurrentUserId);
@@ -530,7 +534,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
     }
 
     @Override
-    public int addAccessibilityInteractionConnection(IWindow windowToken,
+    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
             IAccessibilityInteractionConnection connection, int userId) throws RemoteException {
         synchronized (mLock) {
             // We treat calls from a profile as if made by its parent as profiles
@@ -539,6 +543,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             final int resolvedUserId = mSecurityPolicy
                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
             final int windowId = sNextWindowId++;
+
+            mWindowIdCache.put(windowId, appName);
+            Slog.i("XUJAY....", "addAccessibilityInteractionConnection " + windowId + ", " + appName);
+
             // If the window is from a process that runs across users such as
             // the system UI or the system we add it to the global state that
             // is shared across users.
@@ -2658,6 +2666,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
         }
 
         @Override
+        public boolean setAppBackgroundAlive(String appName) {
+            // Set the app called 'appName' to be active even in the background
+           mWindowManagerService.setAppBackgroundAlive(appName);
+            synchronized (mLock) {
+                mBgActiveAppSet.add(appName);
+            }
+            return true;
+        }
+
+
+        @Override
         public void dump(FileDescriptor fd, final PrintWriter pw, String[] args) {
             mSecurityPolicy.enforceCallingPermission(Manifest.permission.DUMP, FUNCTION_DUMP);
             synchronized (mLock) {
@@ -3206,6 +3225,18 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             reportedWindow.setLayer(window.layer);
             reportedWindow.setFocused(window.focused);
             reportedWindow.setBoundsInScreen(window.boundsInScreen);
+
+            String appName;
+            synchronized (mLock) {
+                appName = mWindowIdCache.get(windowId);
+            }
+            if (appName == null) {
+                appName = "";
+                Slog.w("XUJAY....", "Getting package name from windowId failed.");
+            } else {
+                Slog.d("XUJAY....", "Setting package name: " + appName);
+            }
+            reportedWindow.setPackageName(appName);
 
             final int parentId = findWindowIdLocked(window.parentToken);
             if (parentId >= 0) {
@@ -3758,6 +3789,16 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
             if (windowId == mActiveWindowId) {
                 return true;
             }
+            // TODO: XUJAY
+            synchronized (mLock) {
+                String appName = mWindowIdCache.get(windowId);
+                Slog.i("XUJAY.....", "isRetrievalAllowingWindow: appName " + appName);
+                if (appName != null && mBgActiveAppSet.contains(appName)) {
+                    Slog.i("XUJAY.....", "This is a background app:" + appName + ", just skip checking it");
+                    return true;
+                }
+            }
+
             return findWindowById(windowId) != null;
         }
 

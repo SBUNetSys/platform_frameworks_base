@@ -18,6 +18,7 @@ package android.accessibilityservice;
 
 import android.accessibilityservice.IAccessibilityServiceConnection;
 import android.view.accessibility.AccessibilityEvent;
+import android.graphics.Bitmap;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.view.KeyEvent;
 
@@ -33,6 +34,8 @@ import android.view.KeyEvent;
     void onAccessibilityEvent(in AccessibilityEvent event);
 
     void onInterrupt();
+
+    void onAccessibilityEventForBackground(String pkgName, in AccessibilityEvent event);
 
     void onGesture(int gesture);
 

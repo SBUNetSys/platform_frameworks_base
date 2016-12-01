@@ -64,6 +64,7 @@ interface IAccessibilityServiceConnection {
 
     oneway void setOnKeyEventResult(boolean handled, int sequence);
 
+    boolean setAppBackgroundAlive(String appName);
 
     Bitmap requestSnapshot(int windowId, long accessibilityNodeId, out Bundle bundle, int interactionId,
                            IAccessibilityInteractionConnectionCallback callback, 

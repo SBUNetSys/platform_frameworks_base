@@ -56,6 +56,8 @@ interface IAccessibilityInteractionConnection {
         int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
         int interrogatingPid, long interrogatingTid);
 
+    oneway void setAppBackgroundAlive(String appName);
+
     Bitmap requestSnapshot(long accessibilityNodeId, out Bundle bundle, int interactionId,
                          IAccessibilityInteractionConnectionCallback callback, int flags,
                          int interrogatingPid, long interrogatingTid);

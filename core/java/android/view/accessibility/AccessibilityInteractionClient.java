@@ -536,6 +536,22 @@ public final class AccessibilityInteractionClient
         return false;
     }
 
+    /**
+     * Add a background app record.
+     *
+     * @param appName The background app name.
+     */
+    public void addBackgroundAppRecord(String appName) {
+        sAccessibilityCache.addBackgroundAppRecord(appName);
+    }
+
+
+    /**
+     * Jian: for UIWear background
+     */
+    public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
+        sAccessibilityCache.onAccessibilityEvent(event);
+    }
 
     /**
      * Jian:

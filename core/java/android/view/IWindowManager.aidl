@@ -62,6 +62,8 @@ interface IWindowManager
             in IInputContext inputContext);
     boolean inputMethodClientHasFocus(IInputMethodClient client);
 
+    boolean isActiveEvenInBackground(String pkgName);
+
     void getInitialDisplaySize(int displayId, out Point size);
     void getBaseDisplaySize(int displayId, out Point size);
     void setForcedDisplaySize(int displayId, int width, int height);

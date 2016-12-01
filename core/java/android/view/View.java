@@ -3771,6 +3771,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     private static SparseArray<String> mAttributeMap;
 
     /**
+     * XUJAY: Get package name
+     */
+    public String getPackageName() {
+        return getContext().getPackageName();
+    }
+
+    /**
      * @hide
      */
     String mStartActivityRequestWho;
@@ -6338,6 +6345,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         getBoundsOnScreen(bounds, true);
         info.setBoundsInScreen(bounds);
 
+        Log.i("SyncUI", "...Init AccNodeInfo id is " + mAccessibilityViewId);
+        info.setAccessibilityViewId(mAccessibilityViewId);
+
         ViewParent parent = getParentForAccessibility();
         if (parent instanceof View) {
             info.setParent((View) parent);
@@ -7055,9 +7065,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         View current = this;
         //noinspection ConstantConditions
         do {
-            if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
+            String appName = mContext.getPackageName();
+            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+
+            } else if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
                 return false;
             }
+
             ViewParent parent = current.mParent;
             if (parent == null) {
                 return false; // We are not attached to the view root
