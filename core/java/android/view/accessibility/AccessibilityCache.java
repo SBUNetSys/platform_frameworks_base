@@ -35,7 +35,7 @@ final class AccessibilityCache {
 
     private static final String LOG_TAG = "AccessibilityCache";
 
-    private static final boolean DEBUG = true;  // XUJAY
+    private static final boolean DEBUG = false;
 
     private static final boolean CHECK_INTEGRITY = "eng".equals(Build.TYPE);
 

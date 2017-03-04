@@ -1,0 +1,2502 @@
+diff --git a/api/current.txt b/api/current.txt
+index 554afa3..ba12a29 100644
+--- a/api/current.txt
++++ b/api/current.txt
+@@ -2578,12 +2578,14 @@ package android.accessibilityservice {
+     method public final android.accessibilityservice.AccessibilityServiceInfo getServiceInfo();
+     method public java.util.List<android.view.accessibility.AccessibilityWindowInfo> getWindows();
+     method public abstract void onAccessibilityEvent(android.view.accessibility.AccessibilityEvent);
++    method public abstract void onAccessibilityEventForBackground(java.lang.String, android.view.accessibility.AccessibilityEvent);
+     method public final android.os.IBinder onBind(android.content.Intent);
+     method protected boolean onGesture(int);
+     method public abstract void onInterrupt();
+     method protected boolean onKeyEvent(android.view.KeyEvent);
+     method protected void onServiceConnected();
+     method public final boolean performGlobalAction(int);
++    method public boolean setAppBackgroundAlive(java.lang.String);
+     method public final void setServiceInfo(android.accessibilityservice.AccessibilityServiceInfo);
+     field public static final int GESTURE_SWIPE_DOWN = 2; // 0x2
+     field public static final int GESTURE_SWIPE_DOWN_AND_LEFT = 15; // 0xf
+@@ -39964,6 +39966,7 @@ package android.view {
+     method protected int computeVerticalScrollRange();
+     method public android.view.accessibility.AccessibilityNodeInfo createAccessibilityNodeInfo();
+     method public void createContextMenu(android.view.ContextMenu);
++    method public android.graphics.Bitmap createSnapshot(android.graphics.Bitmap.Config, int, boolean);
+     method public void destroyDrawingCache();
+     method public android.view.WindowInsets dispatchApplyWindowInsets(android.view.WindowInsets);
+     method public void dispatchConfigurationChanged(android.content.res.Configuration);
+@@ -40087,6 +40090,7 @@ package android.view {
+     method public android.view.ViewOutlineProvider getOutlineProvider();
+     method public int getOverScrollMode();
+     method public android.view.ViewOverlay getOverlay();
++    method public java.lang.String getPackageName();
+     method public int getPaddingBottom();
+     method public int getPaddingEnd();
+     method public int getPaddingLeft();
+@@ -41639,6 +41643,7 @@ package android.view.accessibility {
+     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo> findAccessibilityNodeInfosByViewId(java.lang.String);
+     method public android.view.accessibility.AccessibilityNodeInfo findFocus(int);
+     method public android.view.accessibility.AccessibilityNodeInfo focusSearch(int);
++    method public int getAccessibilityViewId();
+     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction> getActionList();
+     method public deprecated int getActions();
+     method public void getBoundsInParent(android.graphics.Rect);
+@@ -41665,6 +41670,7 @@ package android.view.accessibility {
+     method public int getTextSelectionStart();
+     method public android.view.accessibility.AccessibilityNodeInfo getTraversalAfter();
+     method public android.view.accessibility.AccessibilityNodeInfo getTraversalBefore();
++    method public android.view.View getView();
+     method public java.lang.String getViewIdResourceName();
+     method public android.view.accessibility.AccessibilityWindowInfo getWindow();
+     method public int getWindowId();
+@@ -41697,7 +41703,9 @@ package android.view.accessibility {
+     method public boolean removeAction(android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction);
+     method public boolean removeChild(android.view.View);
+     method public boolean removeChild(android.view.View, int);
++    method public android.graphics.Bitmap requestSnapshot(android.os.Bundle);
+     method public void setAccessibilityFocused(boolean);
++    method public void setAccessibilityViewId(int);
+     method public void setBoundsInParent(android.graphics.Rect);
+     method public void setBoundsInScreen(android.graphics.Rect);
+     method public void setCanOpenPopup(boolean);
+@@ -41741,6 +41749,7 @@ package android.view.accessibility {
+     method public void setTraversalAfter(android.view.View, int);
+     method public void setTraversalBefore(android.view.View);
+     method public void setTraversalBefore(android.view.View, int);
++    method public void setView(android.view.View);
+     method public void setViewIdResourceName(java.lang.String);
+     method public void setVisibleToUser(boolean);
+     method public void writeToParcel(android.os.Parcel, int);
+@@ -41918,6 +41927,7 @@ package android.view.accessibility {
+     method public int getChildCount();
+     method public int getId();
+     method public int getLayer();
++    method public java.lang.String getPackageName();
+     method public android.view.accessibility.AccessibilityWindowInfo getParent();
+     method public android.view.accessibility.AccessibilityNodeInfo getRoot();
+     method public int getType();
+@@ -41927,6 +41937,7 @@ package android.view.accessibility {
+     method public static android.view.accessibility.AccessibilityWindowInfo obtain();
+     method public static android.view.accessibility.AccessibilityWindowInfo obtain(android.view.accessibility.AccessibilityWindowInfo);
+     method public void recycle();
++    method public void setPackageName(java.lang.String);
+     method public void writeToParcel(android.os.Parcel, int);
+     field public static final android.os.Parcelable.Creator<android.view.accessibility.AccessibilityWindowInfo> CREATOR;
+     field public static final int TYPE_ACCESSIBILITY_OVERLAY = 4; // 0x4
+diff --git a/api/system-current.txt b/api/system-current.txt
+index 722d682..4378d3b 100644
+--- a/api/system-current.txt
++++ b/api/system-current.txt
+@@ -2678,12 +2678,14 @@ package android.accessibilityservice {
+     method public final android.accessibilityservice.AccessibilityServiceInfo getServiceInfo();
+     method public java.util.List<android.view.accessibility.AccessibilityWindowInfo> getWindows();
+     method public abstract void onAccessibilityEvent(android.view.accessibility.AccessibilityEvent);
++    method public abstract void onAccessibilityEventForBackground(java.lang.String, android.view.accessibility.AccessibilityEvent);
+     method public final android.os.IBinder onBind(android.content.Intent);
+     method protected boolean onGesture(int);
+     method public abstract void onInterrupt();
+     method protected boolean onKeyEvent(android.view.KeyEvent);
+     method protected void onServiceConnected();
+     method public final boolean performGlobalAction(int);
++    method public boolean setAppBackgroundAlive(java.lang.String);
+     method public final void setServiceInfo(android.accessibilityservice.AccessibilityServiceInfo);
+     field public static final int GESTURE_SWIPE_DOWN = 2; // 0x2
+     field public static final int GESTURE_SWIPE_DOWN_AND_LEFT = 15; // 0xf
+@@ -42268,6 +42270,7 @@ package android.view {
+     method protected int computeVerticalScrollRange();
+     method public android.view.accessibility.AccessibilityNodeInfo createAccessibilityNodeInfo();
+     method public void createContextMenu(android.view.ContextMenu);
++    method public android.graphics.Bitmap createSnapshot(android.graphics.Bitmap.Config, int, boolean);
+     method public void destroyDrawingCache();
+     method public android.view.WindowInsets dispatchApplyWindowInsets(android.view.WindowInsets);
+     method public void dispatchConfigurationChanged(android.content.res.Configuration);
+@@ -42391,6 +42394,7 @@ package android.view {
+     method public android.view.ViewOutlineProvider getOutlineProvider();
+     method public int getOverScrollMode();
+     method public android.view.ViewOverlay getOverlay();
++    method public java.lang.String getPackageName();
+     method public int getPaddingBottom();
+     method public int getPaddingEnd();
+     method public int getPaddingLeft();
+@@ -43946,6 +43950,7 @@ package android.view.accessibility {
+     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo> findAccessibilityNodeInfosByViewId(java.lang.String);
+     method public android.view.accessibility.AccessibilityNodeInfo findFocus(int);
+     method public android.view.accessibility.AccessibilityNodeInfo focusSearch(int);
++    method public int getAccessibilityViewId();
+     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction> getActionList();
+     method public deprecated int getActions();
+     method public void getBoundsInParent(android.graphics.Rect);
+@@ -43972,6 +43977,7 @@ package android.view.accessibility {
+     method public int getTextSelectionStart();
+     method public android.view.accessibility.AccessibilityNodeInfo getTraversalAfter();
+     method public android.view.accessibility.AccessibilityNodeInfo getTraversalBefore();
++    method public android.view.View getView();
+     method public java.lang.String getViewIdResourceName();
+     method public android.view.accessibility.AccessibilityWindowInfo getWindow();
+     method public int getWindowId();
+@@ -44004,7 +44010,9 @@ package android.view.accessibility {
+     method public boolean removeAction(android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction);
+     method public boolean removeChild(android.view.View);
+     method public boolean removeChild(android.view.View, int);
++    method public android.graphics.Bitmap requestSnapshot(android.os.Bundle);
+     method public void setAccessibilityFocused(boolean);
++    method public void setAccessibilityViewId(int);
+     method public void setBoundsInParent(android.graphics.Rect);
+     method public void setBoundsInScreen(android.graphics.Rect);
+     method public void setCanOpenPopup(boolean);
+@@ -44048,6 +44056,7 @@ package android.view.accessibility {
+     method public void setTraversalAfter(android.view.View, int);
+     method public void setTraversalBefore(android.view.View);
+     method public void setTraversalBefore(android.view.View, int);
++    method public void setView(android.view.View);
+     method public void setViewIdResourceName(java.lang.String);
+     method public void setVisibleToUser(boolean);
+     method public void writeToParcel(android.os.Parcel, int);
+@@ -44225,6 +44234,7 @@ package android.view.accessibility {
+     method public int getChildCount();
+     method public int getId();
+     method public int getLayer();
++    method public java.lang.String getPackageName();
+     method public android.view.accessibility.AccessibilityWindowInfo getParent();
+     method public android.view.accessibility.AccessibilityNodeInfo getRoot();
+     method public int getType();
+@@ -44234,6 +44244,7 @@ package android.view.accessibility {
+     method public static android.view.accessibility.AccessibilityWindowInfo obtain();
+     method public static android.view.accessibility.AccessibilityWindowInfo obtain(android.view.accessibility.AccessibilityWindowInfo);
+     method public void recycle();
++    method public void setPackageName(java.lang.String);
+     method public void writeToParcel(android.os.Parcel, int);
+     field public static final android.os.Parcelable.Creator<android.view.accessibility.AccessibilityWindowInfo> CREATOR;
+     field public static final int TYPE_ACCESSIBILITY_OVERLAY = 4; // 0x4
+diff --git a/cmds/strong/Android.mk b/cmds/strong/Android.mk
+new file mode 100644
+index 0000000..e7a2168
+--- /dev/null
++++ b/cmds/strong/Android.mk
+@@ -0,0 +1,15 @@
++# Copyright 2011 The Android Open Source Project  
++#
++LOCAL_PATH:= $(call my-dir)
++
++include $(CLEAR_VARS)
++LOCAL_SRC_FILES := $(call all-subdir-java-files)
++LOCAL_MODULE := strong 
++include $(BUILD_JAVA_LIBRARY)
++
++include $(CLEAR_VARS)  
++LOCAL_MODULE := strong 
++LOCAL_SRC_FILES := strong
++LOCAL_MODULE_CLASS := EXECUTABLES
++LOCAL_MODULE_TAGS := optional
++include $(BUILD_PREBUILT)
+diff --git a/cmds/strong/src/com/android/commands/strong/strong.java b/cmds/strong/src/com/android/commands/strong/strong.java
+new file mode 100644
+index 0000000..be310f6
+--- /dev/null
++++ b/cmds/strong/src/com/android/commands/strong/strong.java
+@@ -0,0 +1,73 @@
++/*
++ * Copyright (C) 2012 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.commands.strong;
++
++import android.app.ActivityManagerNative;
++import android.app.IActivityManager;
++import android.app.IActivityManager.ContentProviderHolder;
++import android.content.IContentProvider;
++import android.os.Binder;
++import android.os.Bundle;
++import android.os.IBinder;
++import android.os.RemoteException;
++import android.os.UserHandle;
++
++public final class strong {
++    static final String TAG = "strong";
++
++    static String[] mArgs;
++    int mNextArg;
++    static int value = 0;
++
++    public static void main(String[] args) {
++        int c;
++
++        printUsage();
++        System.err.println("Wellcom strong test function!!");
++     
++        try {
++            new strong().run();
++        } catch (Exception e) {
++            System.err.println("Unable to run settings command");
++        }
++    }
++
++    public void run() {
++
++        try {
++            System.err.println("Now strong run() again");
++        } catch (Exception e) {
++            System.err.println("Now strong run() Exception");
++        }
++
++    }
++
++    private String nextArg() {
++        if (mNextArg >= mArgs.length) {
++            return null;
++        }
++        String arg = mArgs[mNextArg];
++        mNextArg++;
++        return arg;
++    }
++
++    private static void printUsage() {
++        System.err.println("usage:  strong -a -b -h");
++        System.err.println("'a' is for add");
++        System.err.println("-h for help");
++    }
++}  
+\ No newline at end of file
+diff --git a/cmds/strong/strong b/cmds/strong/strong
+new file mode 100755
+index 0000000..62d5947
+--- /dev/null
++++ b/cmds/strong/strong
+@@ -0,0 +1,6 @@
++# Script to start "strong" on the device  
++#  
++#
++base=/system
++export CLASSPATH=$base/framework/strong.jar
++exec app_process $base/bin com.android.commands.strong.strong "$@"
+diff --git a/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java b/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java
+index c35f7fc..20d0210 100644
+--- a/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java
++++ b/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java
+@@ -52,7 +52,7 @@ public class DumpCommand extends Command {
+     @Override
+     public String detailedOptions() {
+         return "    dump [--verbose][file]\n"
+-            + "      [--compressed]: dumps compressed layout information.\n"
++            + "      [--compressed]: dumps compressed layout information. XUJAY......\n"
+             + "      [file]: the location where the dumped XML should be stored, default is\n      "
+             + DEFAULT_DUMP_FILE.getAbsolutePath() + "\n";
+     }
+diff --git a/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/EventsCommand.java b/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/EventsCommand.java
+index ce55f18..3028268 100644
+--- a/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/EventsCommand.java
++++ b/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/EventsCommand.java
+@@ -40,7 +40,7 @@ public class EventsCommand extends Command {
+ 
+     @Override
+     public String shortHelp() {
+-        return "prints out accessibility events until terminated";
++        return "prints out accessibility events until terminated.....XUJAY.........";
+     }
+ 
+     @Override
+@@ -56,10 +56,14 @@ public class EventsCommand extends Command {
+                 new OnAccessibilityEventListener() {
+             @Override
+             public void onAccessibilityEvent(AccessibilityEvent event) {
++                System.out.println(event.getPackageName());
++
+                 SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
+                 System.out.println(String.format("%s %s",
+                         formatter.format(new Date()), event.toString()));
++
+             }
++
+         });
+         // there's really no way to stop, essentially we just block indefinitely here and wait
+         // for user to press Ctrl+C
+diff --git a/core/java/android/accessibilityservice/AccessibilityService.java b/core/java/android/accessibilityservice/AccessibilityService.java
+index 9d6aa13..3764dc4 100644
+--- a/core/java/android/accessibilityservice/AccessibilityService.java
++++ b/core/java/android/accessibilityservice/AccessibilityService.java
+@@ -368,6 +368,7 @@ public abstract class AccessibilityService extends Service {
+      */
+     public interface Callbacks {
+         public void onAccessibilityEvent(AccessibilityEvent event);
++        public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event);
+         public void onInterrupt();
+         public void onServiceConnected();
+         public void init(int connectionId, IBinder windowToken);
+@@ -391,6 +392,35 @@ public abstract class AccessibilityService extends Service {
+     public abstract void onAccessibilityEvent(AccessibilityEvent event);
+ 
+     /**
++     * This API captures event of the 'pkgName' application even in background
++     *
++     * @param event An event.
++     */
++    public abstract void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event);
++
++
++    /**
++     * This API sets specified app to be alive even when it swithes to background
++     *
++     * @param appName the name of the app
++     */
++    public boolean setAppBackgroundAlive(String appName) {
++        Log.d("XUJAY_API", "setAppBackgroundAlive");
++        AccessibilityInteractionClient interactionClient = AccessibilityInteractionClient.getInstance();
++        interactionClient.addBackgroundAppRecord(appName);
++
++        IAccessibilityServiceConnection connection = interactionClient.getConnection(mConnectionId);
++        if (connection != null) {
++            try {
++                return connection.setAppBackgroundAlive(appName);
++            } catch (RemoteException re) {
++                Log.w(LOG_TAG, "Error while calling performGlobalAction", re);
++            }
++        }
++        return false;
++    }
++
++    /**
+      * Callback for interrupting the accessibility feedback.
+      */
+     public abstract void onInterrupt();
+@@ -659,6 +689,11 @@ public abstract class AccessibilityService extends Service {
+             }
+ 
+             @Override
++            public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
++                AccessibilityService.this.onAccessibilityEventForBackground(pkgName, event);
++            }
++       
++            @Override
+             public void init(int connectionId, IBinder windowToken) {
+                 mConnectionId = connectionId;
+                 mWindowToken = windowToken;
+@@ -695,6 +730,7 @@ public abstract class AccessibilityService extends Service {
+         private static final int DO_ON_GESTURE = 4;
+         private static final int DO_CLEAR_ACCESSIBILITY_CACHE = 5;
+         private static final int DO_ON_KEY_EVENT = 6;
++        private static final int DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND = 7;
+ 
+         private final HandlerCaller mCaller;
+ 
+@@ -725,6 +761,12 @@ public abstract class AccessibilityService extends Service {
+             mCaller.sendMessage(message);
+         }
+ 
++        public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
++            Log.i("XUJAY....", "IAccessibilityServiceClientWrapper::onAccessibilityEventForBackground..");
++            Message message = mCaller.obtainMessageOO(DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND, pkgName, event);
++            mCaller.sendMessage(message);
++        }
++
+         public void onGesture(int gestureId) {
+             Message message = mCaller.obtainMessageI(DO_ON_GESTURE, gestureId);
+             mCaller.sendMessage(message);
+@@ -745,7 +787,9 @@ public abstract class AccessibilityService extends Service {
+         public void executeMessage(Message message) {
+             switch (message.what) {
+                 case DO_ON_ACCESSIBILITY_EVENT: {
++                    Log.i("XUJAY...", "DO_ON_ACCESSIBILITY_EVENT: here is the executeMessage().....");
+                     AccessibilityEvent event = (AccessibilityEvent) message.obj;
++
+                     if (event != null) {
+                         AccessibilityInteractionClient.getInstance().onAccessibilityEvent(event);
+                         mCallback.onAccessibilityEvent(event);
+@@ -758,6 +802,25 @@ public abstract class AccessibilityService extends Service {
+                     }
+                 } return;
+ 
++                case DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND: {
++                    SomeArgs args = (SomeArgs) message.obj;
++                    String pkgName = (String) args.arg1;
++                    AccessibilityEvent event = (AccessibilityEvent) args.arg2;
++                    Log.i("XUJAY...", "DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND: pkgName " + pkgName + ", event " + event);
++
++                    // XUJAY: TODO, replace null with parameter package name
++                    if (event != null) {
++                        AccessibilityInteractionClient.getInstance().onAccessibilityEventForBackground(pkgName, event);
++                        mCallback.onAccessibilityEventForBackground(pkgName, event);
++                        // Make sure the event is recycled.
++                        try {
++                            event.recycle();
++                        } catch (IllegalStateException ise) {
++                            /* ignore - best effort */
++                        }
++                    }
++                } return;
++         
+                 case DO_ON_INTERRUPT: {
+                     mCallback.onInterrupt();
+                 } return;
+diff --git a/core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl b/core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl
+index 8b503dd..671578b 100644
+--- a/core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl
++++ b/core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl
+@@ -32,6 +32,8 @@ import android.view.KeyEvent;
+ 
+     void onAccessibilityEvent(in AccessibilityEvent event);
+ 
++    void onAccessibilityEventForBackground(String pkgName, in AccessibilityEvent event);
++
+     void onInterrupt();
+ 
+     void onGesture(int gesture);
+diff --git a/core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl b/core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl
+index 5f7a17d..6974cc6 100644
+--- a/core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl
++++ b/core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl
+@@ -18,6 +18,7 @@ package android.accessibilityservice;
+ 
+ import android.os.Bundle;
+ import android.accessibilityservice.AccessibilityServiceInfo;
++import android.graphics.Bitmap;
+ import android.view.MagnificationSpec;
+ import android.view.accessibility.AccessibilityNodeInfo;
+ import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
+@@ -62,5 +63,11 @@ interface IAccessibilityServiceConnection {
+ 
+     boolean performGlobalAction(int action);
+ 
++    boolean setAppBackgroundAlive(String appName);
++
+     oneway void setOnKeyEventResult(boolean handled, int sequence);
++
++    Bitmap requestSnapshot(int windowId, long accessibilityNodeId, out Bundle bundle, int interactionId,
++                           IAccessibilityInteractionConnectionCallback callback, 
++                           long interrogatingTid);
+ }
+diff --git a/core/java/android/app/Activity.java b/core/java/android/app/Activity.java
+index ecd0050..357d562 100644
+--- a/core/java/android/app/Activity.java
++++ b/core/java/android/app/Activity.java
+@@ -673,7 +673,7 @@ public class Activity extends ContextThemeWrapper
+         OnCreateContextMenuListener, ComponentCallbacks2,
+         Window.OnWindowDismissedCallback {
+     private static final String TAG = "Activity";
+-    private static final boolean DEBUG_LIFECYCLE = false;
++    private static final boolean DEBUG_LIFECYCLE = true;
+ 
+     /** Standard activity result: operation canceled. */
+     public static final int RESULT_CANCELED    = 0;
+@@ -1615,11 +1615,18 @@ public class Activity extends ContextThemeWrapper
+     @CallSuper
+     protected void onStop() {
+         if (DEBUG_LIFECYCLE) Slog.v(TAG, "onStop " + this);
+-        if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(false);
+-        mActivityTransitionState.onStop();
+-        getApplication().dispatchActivityStopped(this);
+-        mTranslucentCallback = null;
+-        mCalled = true;
++        // XUJAY: HERE, try to add something
++        // if (this.toString().contains("Settings")) {
++        //     // Do nothing
++            
++        // } else
++        {
++            if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(false);
++            mActivityTransitionState.onStop();
++            getApplication().dispatchActivityStopped(this);
++            mTranslucentCallback = null;
++            mCalled = true;
++        }
+     }
+ 
+     /**
+diff --git a/core/java/android/app/UiAutomation.java b/core/java/android/app/UiAutomation.java
+index efed2e0..106c990 100644
+--- a/core/java/android/app/UiAutomation.java
++++ b/core/java/android/app/UiAutomation.java
+@@ -1017,6 +1017,23 @@ public final class UiAutomation {
+                 }
+ 
+                 @Override
++                public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
++                    // The pkgName hasn't been used yet
++                    synchronized (mLock) {
++                        mLastEventTimeMillis = event.getEventTime();
++                        if (mWaitingForEventDelivery) {
++                            mEventQueue.add(AccessibilityEvent.obtain(event));
++                        }
++                        mLock.notifyAll();
++                    }
++                    // Calling out only without a lock held.
++                    final OnAccessibilityEventListener listener = mOnAccessibilityEventListener;
++                    if (listener != null) {
++                        listener.onAccessibilityEvent(AccessibilityEvent.obtain(event));
++                    }
++                }
++
++                @Override
+                 public boolean onKeyEvent(KeyEvent event) {
+                     return false;
+                 }
+diff --git a/core/java/android/view/AccessibilityInteractionController.java b/core/java/android/view/AccessibilityInteractionController.java
+index 664c02a..e5b588f 100644
+--- a/core/java/android/view/AccessibilityInteractionController.java
++++ b/core/java/android/view/AccessibilityInteractionController.java
+@@ -19,6 +19,7 @@ package android.view;
+ import android.graphics.Point;
+ import android.graphics.Rect;
+ import android.graphics.Region;
++import android.graphics.Bitmap;
+ import android.os.Binder;
+ import android.os.Bundle;
+ import android.os.Handler;
+@@ -36,6 +37,7 @@ import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
+ import com.android.internal.os.SomeArgs;
+ import com.android.internal.util.Predicate;
+ 
++import android.util.Log;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.HashSet;
+@@ -93,7 +95,8 @@ final class AccessibilityInteractionController {
+         // tree traversal.
+         return (view.mAttachInfo != null
+                 && view.mAttachInfo.mWindowVisibility == View.VISIBLE
+-                && view.isShown());
++                && view.isShown()) ||
++                (view.mAttachInfo != null && WindowManagerGlobal.isActiveEvenInBackground(view.getPackageName()));
+     }
+ 
+     public void findAccessibilityNodeInfoByAccessibilityIdClientThread(
+@@ -154,7 +157,9 @@ final class AccessibilityInteractionController {
+             }
+             if (root != null && isShown(root)) {
+                 mPrefetcher.prefetchAccessibilityNodeInfos(root, virtualDescendantId, flags, infos);
++                Log.i("XUJAY....", "Prefetching the accessibility nodes");
+             }
++
+         } finally {
+             try {
+                 mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
+@@ -246,6 +251,7 @@ final class AccessibilityInteractionController {
+                     mAddNodeInfosForViewId = new AddNodeInfosForViewId();
+                 }
+                 mAddNodeInfosForViewId.init(resolvedViewId, infos);
++                Log.i("XUJAY....", "root.findViewByPredicate(mAddNodeInfosForViewId)");
+                 root.findViewByPredicate(mAddNodeInfosForViewId);
+                 mAddNodeInfosForViewId.reset();
+             }
+@@ -329,6 +335,7 @@ final class AccessibilityInteractionController {
+                 root = mViewRootImpl.mView;
+             }
+             if (root != null && isShown(root)) {
++                Log.i("XUJAY....", "findAccessibilityNodeInfosByTextUiThread .....");
+                 AccessibilityNodeProvider provider = root.getAccessibilityNodeProvider();
+                 if (provider != null) {
+                     if (virtualDescendantId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+@@ -627,6 +634,120 @@ final class AccessibilityInteractionController {
+         }
+     }
+ 
++
++    public void requestSnapshotClientThread(long accessibilityNodeId, Bundle bundle, int interactionId,
++                                            IAccessibilityInteractionConnectionCallback callback, int flags,
++                                            int interogatingPid, long interrogatingTid) {
++        Message message = mHandler.obtainMessage();
++        message.what = PrivateHandler.MSG_REQUEST_SNAPSHOT;
++        message.arg1 = flags;
++        message.arg2 = AccessibilityNodeInfo.getAccessibilityViewId(accessibilityNodeId);
++        
++        SomeArgs args = SomeArgs.obtain();
++        args.argi1 = interactionId;
++        args.arg1 = bundle;
++        args.arg2 = callback;
++        
++        message.obj = args;
++
++        // If the interrogation is performed by the same thread as the main UI
++        // thread in this process, set the message as a static reference so
++        // after this call completes the same thread but in the interrogating
++        // client can handle the message to generate the result.
++        if (interogatingPid == mMyProcessId && interrogatingTid == mMyLooperThreadId) {
++            AccessibilityInteractionClient.getInstanceForThread(
++                interrogatingTid).setSameThreadMessage(message);
++        } else {
++            mHandler.sendMessage(message);
++        }
++    }
++
++
++    private void requestSnapshotUiThread(Message message) {
++        final int flags = message.arg1;
++        final int accessibilityViewId = message.arg2;
++
++        SomeArgs args = (SomeArgs) message.obj;
++        int interactionId = args.argi1;
++        Bundle bundle = (Bundle) args.arg1;
++        final IAccessibilityInteractionConnectionCallback callback =
++            (IAccessibilityInteractionConnectionCallback) args.arg2;
++        args.recycle();
++        
++        boolean succeeded = false;
++        try {
++            if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null) {
++                return;
++            }
++            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
++            View target = null;
++            if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
++                target = findViewByAccessibilityId(accessibilityViewId);
++            } else {
++                target = mViewRootImpl.mView;
++            }
++            if (target != null && isShown(target)) {
++                AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
++                if (provider != null) {
++                    succeeded = false;  // has not support provider yet
++
++                } else {
++                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
++                    Bitmap bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
++                    String bitmapKey = "bitmap";
++                    bundle.putParcelable(bitmapKey, bitmap);
++                    succeeded = true;
++                }
++            }
++        } finally {
++            try {
++                mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
++                callback.setRequestSnapshotResult(succeeded, interactionId);
++
++            } catch (RemoteException re) {
++                /* ignore - the other side will time out */
++            }
++        }
++    }
++
++
++    public Bitmap getSnapshot(long accessibilityNodeId, Bundle bundle, int interactionId,
++                              IAccessibilityInteractionConnectionCallback callback, int flags,
++                              int interogatingPid, long interrogatingTid) {
++
++        Log.i("SyncUI", "AccInteractionController......getSnapshot.....");
++        final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(accessibilityNodeId);
++        Bitmap bitmap = null;
++        try {
++            if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null) {
++                return null;
++            }
++            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
++            View target = null;
++            if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
++                Log.w("SyncUI", "accessibiityViewId != UNDEFINED_ITEM_ID. " + accessibilityViewId + " " + accessibilityNodeId);
++                target = findViewByAccessibilityId(accessibilityViewId);
++            } else {
++                Log.i("SyncUI", "use parent view");
++                target = mViewRootImpl.mView;
++            }
++            if (target != null && isShown(target)) {
++                AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
++                if (provider != null) {
++                    return null;
++                } else {
++                    bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
++                    String bitmapKey = "bitmap";
++                    bundle.putParcelable(bitmapKey, bitmap);
++                }
++            }
++        } finally {
++            mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = 0;
++        }
++        return bitmap;
++    }
++
++
+     private void performAccessibilityActionUiThread(Message message) {
+         final int flags = message.arg1;
+         final int accessibilityViewId = message.arg2;
+@@ -642,11 +763,13 @@ final class AccessibilityInteractionController {
+         args.recycle();
+ 
+         boolean succeeded = false;
++        Log.i("XUJAY_API", "performAccessibilityActionUiThread.....1");
+         try {
+             if (mViewRootImpl.mView == null || mViewRootImpl.mAttachInfo == null ||
+                     mViewRootImpl.mStopped || mViewRootImpl.mPausedForTransition) {
+                 return;
+             }
++            Log.i("XUJAY_API", "performAccessibilityActionUiThread.....2");
+             mViewRootImpl.mAttachInfo.mAccessibilityFetchFlags = flags;
+             View target = null;
+             if (accessibilityViewId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+@@ -655,6 +778,7 @@ final class AccessibilityInteractionController {
+                 target = mViewRootImpl.mView;
+             }
+             if (target != null && isShown(target)) {
++                Log.i("XUJAY_API", "performAccessibilityActionUiThread.....3");
+                 AccessibilityNodeProvider provider = target.getAccessibilityNodeProvider();
+                 if (provider != null) {
+                     if (virtualDescendantId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
+@@ -665,6 +789,7 @@ final class AccessibilityInteractionController {
+                                 action, arguments);
+                     }
+                 } else if (virtualDescendantId == AccessibilityNodeInfo.UNDEFINED_ITEM_ID) {
++                    Log.i("XUJAY_API", "performAccessibilityActionUiThread.....4");
+                     succeeded = target.performAccessibilityAction(action, arguments);
+                 }
+             }
+@@ -1157,6 +1282,7 @@ final class AccessibilityInteractionController {
+         private final static int MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_TEXT = 4;
+         private final static int MSG_FIND_FOCUS = 5;
+         private final static int MSG_FOCUS_SEARCH = 6;
++        private final static int MSG_REQUEST_SNAPSHOT = 7;
+ 
+         public PrivateHandler(Looper looper) {
+             super(looper);
+@@ -1178,6 +1304,8 @@ final class AccessibilityInteractionController {
+                     return "MSG_FIND_FOCUS";
+                 case MSG_FOCUS_SEARCH:
+                     return "MSG_FOCUS_SEARCH";
++                case MSG_REQUEST_SNAPSHOT:
++                    return "MSG_REQUEST_SNAPSHOT";
+                 default:
+                     throw new IllegalArgumentException("Unknown message type: " + type);
+             }
+@@ -1205,6 +1333,9 @@ final class AccessibilityInteractionController {
+                 case MSG_FOCUS_SEARCH: {
+                     focusSearchUiThread(message);
+                 } break;
++                case MSG_REQUEST_SNAPSHOT: {
++                    requestSnapshotUiThread(message);
++                } break;
+                 default:
+                     throw new IllegalArgumentException("Unknown message type: " + type);
+             }
+@@ -1227,10 +1358,43 @@ final class AccessibilityInteractionController {
+ 
+         @Override
+         public boolean apply(View view) {
+-            if (view.getId() == mViewId && isShown(view)) {
++            String appName = view.getPackageName();
++            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
++                if (view.getId() == mViewId) {
++                    Log.i("XUJAY....", "Predicate: apply mviewid " + mViewId);
++                    mInfos.add(view.createAccessibilityNodeInfo());
++                }
++            } else {
++                if (view.getId() == mViewId && isShown(view)) {
++                    mInfos.add(view.createAccessibilityNodeInfo());
++                }
++            }
++            return false;
++        }
++    }
++
++    private final class UIWearAddNodeInfosForViewId implements Predicate<View> {
++        private int mViewId = View.NO_ID;
++        private List<AccessibilityNodeInfo> mInfos;
++
++        public void init(int viewId, List<AccessibilityNodeInfo> infos) {
++            mViewId = viewId;
++            mInfos = infos;
++        }
++
++        public void reset() {
++            mViewId = View.NO_ID;
++            mInfos = null;
++        }
++
++        // Comparing to AddNodeInfosForViewId, the only difference is this function
++        @Override
++        public boolean apply(View view) {
++            if (view.getId() == mViewId) {
+                 mInfos.add(view.createAccessibilityNodeInfo());
+             }
+             return false;
+         }
+     }
++
+ }
+diff --git a/core/java/android/view/IWindowManager.aidl b/core/java/android/view/IWindowManager.aidl
+index 5994d4f..d73aa03 100644
+--- a/core/java/android/view/IWindowManager.aidl
++++ b/core/java/android/view/IWindowManager.aidl
+@@ -62,6 +62,8 @@ interface IWindowManager
+             in IInputContext inputContext);
+     boolean inputMethodClientHasFocus(IInputMethodClient client);
+ 
++    boolean isActiveEvenInBackground(String pkgName);
++
+     void getInitialDisplaySize(int displayId, out Point size);
+     void getBaseDisplaySize(int displayId, out Point size);
+     void setForcedDisplaySize(int displayId, int width, int height);
+diff --git a/core/java/android/view/InputQueue.java b/core/java/android/view/InputQueue.java
+index aebc601..3aed26a 100644
+--- a/core/java/android/view/InputQueue.java
++++ b/core/java/android/view/InputQueue.java
+@@ -18,6 +18,7 @@ package android.view;
+ 
+ import dalvik.system.CloseGuard;
+ 
++import android.util.Log;
+ import android.os.Looper;
+ import android.os.MessageQueue;
+ import android.util.Pools.Pool;
+@@ -90,6 +91,9 @@ public final class InputQueue {
+     /** @hide */
+     public void sendInputEvent(InputEvent e, Object token, boolean predispatch,
+             FinishedInputEventCallback callback) {
++
++        Log.i("XUJAY...", "InputQueue::sendInputEvent().........");
++
+         ActiveInputEvent event = obtainActiveInputEvent(token, callback);
+         long id;
+         if (e instanceof KeyEvent) {
+diff --git a/core/java/android/view/View.java b/core/java/android/view/View.java
+index 56c2621..39310b9 100644
+--- a/core/java/android/view/View.java
++++ b/core/java/android/view/View.java
+@@ -3769,6 +3769,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+     private static SparseArray<String> mAttributeMap;
+ 
+     /**
++     * XUJAY: Get package name
++     */
++    public String getPackageName() {
++        return getContext().getPackageName();
++    }
++
++    /**
+      * @hide
+      */
+     String mStartActivityRequestWho;
+@@ -5201,6 +5208,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+         final ListenerInfo li = mListenerInfo;
+         if (li != null && li.mOnClickListener != null) {
+             playSoundEffect(SoundEffectConstants.CLICK);
++            Log.i("XUJAY_API", this.toString());
+             li.mOnClickListener.onClick(this);
+             result = true;
+         } else {
+@@ -5756,6 +5764,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @see AccessibilityDelegate
+      */
+     public void sendAccessibilityEvent(int eventType) {
++        Log.i(VIEW_LOG_TAG, "XUJAY....sendAccessibilityEvent");
+         if (mAccessibilityDelegate != null) {
+             mAccessibilityDelegate.sendAccessibilityEvent(this, eventType);
+         } else {
+@@ -5827,6 +5836,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @hide
+      */
+     public void sendAccessibilityEventUncheckedInternal(AccessibilityEvent event) {
++        Log.i("XUJAY....", "sendAccessibilityEventUncheckedInternal: isShown()" + isShown());
+         if (!isShown()) {
+             return;
+         }
+@@ -5837,6 +5847,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+         }
+         // In the beginning we called #isShown(), so we know that getParent() is not null.
+         getParent().requestSendAccessibilityEvent(this, event);
++
+     }
+ 
+     /**
+@@ -6334,6 +6345,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+         getBoundsOnScreen(bounds, true);
+         info.setBoundsInScreen(bounds);
+ 
++        Log.i("SyncUI", "...Init AccNodeInfo id is " + mAccessibilityViewId);
++        info.setAccessibilityViewId(mAccessibilityViewId);
++
+         ViewParent parent = getParentForAccessibility();
+         if (parent instanceof View) {
+             info.setParent((View) parent);
+@@ -7047,9 +7061,16 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+         View current = this;
+         //noinspection ConstantConditions
+         do {
+-            if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
+-                return false;
++            //Log.i("XUJAY....", "isShown() in package: " +  mContext.getPackageName());
++            String appName = mContext.getPackageName();
++            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
++                    
++            } else {
++                if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
++                    return false;
++                }
+             }
++
+             ViewParent parent = current.mParent;
+             if (parent == null) {
+                 return false; // We are not attached to the view root
+@@ -9266,16 +9287,17 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @return True if the event was handled by the view, false otherwise.
+      */
+     public boolean dispatchTouchEvent(MotionEvent event) {
++        Log.i("XUJAY....", "dispatchTouchEvent..");
+         // If the event should be handled by accessibility focus first.
+         if (event.isTargetAccessibilityFocus()) {
+             // We don't have focus or no virtual descendant has it, do not handle the event.
+             if (!isAccessibilityFocusedViewOrHost()) {
++                Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+                 return false;
+             }
+             // We have focus and got the event, then use normal event dispatch.
+             event.setTargetAccessibilityFocus(false);
+         }
+-
+         boolean result = false;
+ 
+         if (mInputEventConsistencyVerifier != null) {
+@@ -9287,7 +9309,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+             // Defensive cleanup for new gesture
+             stopNestedScroll();
+         }
+-
++        Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+         if (onFilterTouchEventForSecurity(event)) {
+             //noinspection SimplifiableIfStatement
+             ListenerInfo li = mListenerInfo;
+@@ -9296,10 +9318,17 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+                     && li.mOnTouchListener.onTouch(this, event)) {
+                 result = true;
+             }
+-
+-            if (!result && onTouchEvent(event)) {
+-                result = true;
++            Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
++                  + " result:" + result);
++            if (!result) {
++                Log.i("XUJAY...", "dispatchTouchEvent calling onTouchEvent()");
++                if (onTouchEvent(event)) {   // XUJAY: This normally sets true
++                    result = true;
++                }
++                Log.i("XUJAY...", "After dispatchTouchEvent calling onTouchEvent():" + result);
+             }
++            Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
++                  + " result:" + result);
+         }
+ 
+         if (!result && mInputEventConsistencyVerifier != null) {
+@@ -9314,7 +9343,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+                 (actionMasked == MotionEvent.ACTION_DOWN && !result)) {
+             stopNestedScroll();
+         }
+-
++        Log.i("XUJAY...", "dispatchTouchEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber()
++              + " result:" + result);
+         return result;
+     }
+ 
+@@ -9368,6 +9398,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @return True if the event was handled by the view, false otherwise.
+      */
+     public boolean dispatchGenericMotionEvent(MotionEvent event) {
++        Log.i("XUJAY...", "dispatchGenericMotionEvent....");
+         if (mInputEventConsistencyVerifier != null) {
+             mInputEventConsistencyVerifier.onGenericMotionEvent(event, 0);
+         }
+@@ -9379,22 +9410,27 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+                     || action == MotionEvent.ACTION_HOVER_MOVE
+                     || action == MotionEvent.ACTION_HOVER_EXIT) {
+                 if (dispatchHoverEvent(event)) {
++                    Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+                     return true;
+                 }
+             } else if (dispatchGenericPointerEvent(event)) {
++                Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+                 return true;
+             }
+         } else if (dispatchGenericFocusedEvent(event)) {
++            Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+             return true;
+         }
+ 
+         if (dispatchGenericMotionEventInternal(event)) {
++            Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+             return true;
+         }
+ 
+         if (mInputEventConsistencyVerifier != null) {
+             mInputEventConsistencyVerifier.onUnhandledEvent(event, 0);
+         }
++        Log.i("XUJAY...", "dispatchGenericMotionEvent...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+         return false;
+     }
+ 
+@@ -9516,7 +9552,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @hide
+      */
+     public final boolean dispatchPointerEvent(MotionEvent event) {
++        Log.i("XUJAY.....", "dispatching the dispatching event....." + toString());
+         if (event.isTouchEvent()) {
++            Log.i("XUJAY....", "is touching event....");
+             return dispatchTouchEvent(event);
+         } else {
+             return dispatchGenericMotionEvent(event);
+@@ -10269,6 +10307,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+      * @return True if the event was handled, false otherwise.
+      */
+     public boolean onTouchEvent(MotionEvent event) {
++        Log.i("XUJAY...", "onTouchEvent()....");
++
+         final float x = event.getX();
+         final float y = event.getY();
+         final int viewFlags = mViewFlags;
+@@ -10400,10 +10440,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+                     }
+                     break;
+             }
+-
++            Log.i("XUJAY...", "onTouchEvent()...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+             return true;
+         }
+-
++        Log.i("XUJAY...", "onTouchEvent()...." +  Thread.currentThread().getStackTrace()[2].getLineNumber());
+         return false;
+     }
+ 
+@@ -15562,6 +15602,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
+             // Restore the cached Canvas for our siblings
+             attachInfo.mCanvas = canvas;
+         }
++        Log.i("UIWear_View", "Setting bitmap.getByteCount: " + bitmap.getByteCount());
+ 
+         return bitmap;
+     }
+diff --git a/core/java/android/view/ViewRootImpl.java b/core/java/android/view/ViewRootImpl.java
+index d7ba103..c85d5ca 100644
+--- a/core/java/android/view/ViewRootImpl.java
++++ b/core/java/android/view/ViewRootImpl.java
+@@ -35,6 +35,7 @@ import android.graphics.PointF;
+ import android.graphics.PorterDuff;
+ import android.graphics.Rect;
+ import android.graphics.Region;
++import android.graphics.Bitmap;
+ import android.graphics.drawable.Drawable;
+ import android.hardware.display.DisplayManager;
+ import android.hardware.display.DisplayManager.DisplayListener;
+@@ -89,6 +90,7 @@ import java.io.PrintWriter;
+ import java.lang.ref.WeakReference;
+ import java.util.ArrayList;
+ import java.util.HashSet;
++import android.util.ArraySet;
+ 
+ /**
+  * The top of a view hierarchy, implementing the needed protocol between View
+@@ -999,6 +1001,14 @@ public final class ViewRootImpl implements ViewParent,
+     }
+ 
+     void setWindowStopped(boolean stopped) {
++        // XUJAY: make the activity alive when the app is the Setting App
++        Log.i("XUJAY..." + mBasePackageName, "setWindowStopped(): " + stopped + " packagename:" + mBasePackageName
++              + ", isActiveEvenInBackground(" + mBasePackageName + ")");
++
++        if (mBasePackageName != null && WindowManagerGlobal.isActiveEvenInBackground(mBasePackageName)) {
++            mStopped = false;
++            return;
++        }
+         if (mStopped != stopped) {
+             mStopped = stopped;
+             if (!mStopped) {
+@@ -3710,12 +3720,21 @@ public final class ViewRootImpl implements ViewParent,
+             if (mView == null || !mAdded) {
+                 Slog.w(TAG, "Dropping event due to root view being removed: " + q.mEvent);
+                 return true;
+-            } else if ((!mAttachInfo.mHasWindowFocus
+-                    && !q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) || mStopped
+-                    || mIsAmbientMode || (mPausedForTransition && !isBack(q.mEvent))) {
++            } else if ((!mAttachInfo.mHasWindowFocus && !q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER))
++                       || mStopped || mIsAmbientMode || (mPausedForTransition && !isBack(q.mEvent))) {
++                
++                Slog.w(TAG,
++                       "mAttachInfo.mHasWindowFocus:" + mAttachInfo.mHasWindowFocus
++                       + ", q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER):" + q.mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER)
++                       + ", mstopped: " + mStopped
++                       + ", mIsAmbientMode: " + mIsAmbientMode
++                       + ", (mPausedForTransition && !isBack(q.mEvent)): " + (mPausedForTransition && !isBack(q.mEvent)));
++
+                 // This is a focus event and the window doesn't currently have input focus or
+                 // has stopped. This could be an event that came back from the previous stage
+                 // but the window has lost focus or stopped in the meantime.
++                Slog.w(TAG, "isTerminalInputEvent(q.mEvent): " + isTerminalInputEvent(q.mEvent));
++
+                 if (isTerminalInputEvent(q.mEvent)) {
+                     // Don't drop terminal input events, however mark them as canceled.
+                     q.mEvent.cancel();
+@@ -3723,6 +3742,7 @@ public final class ViewRootImpl implements ViewParent,
+                     return false;
+                 }
+ 
++                // XUJAY:....dropping here........
+                 // Drop non-terminal input events.
+                 Slog.w(TAG, "Dropping event due to no window focus: " + q.mEvent);
+                 return true;
+@@ -4101,6 +4121,7 @@ public final class ViewRootImpl implements ViewParent,
+                 handleDispatchWindowAnimationStopped();
+                 final int source = q.mEvent.getSource();
+                 if ((source & InputDevice.SOURCE_CLASS_POINTER) != 0) {
++                    // XUJAY....
+                     return processPointerEvent(q);
+                 } else if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
+                     return processTrackballEvent(q);
+@@ -4231,7 +4252,9 @@ public final class ViewRootImpl implements ViewParent,
+             return FORWARD;
+         }
+ 
++        // XUJAY: Change here
+         private int processPointerEvent(QueuedInputEvent q) {
++            Log.i("XUJAY...", "ViewRootImpl.processPointerEvent()....");
+             final MotionEvent event = (MotionEvent)q.mEvent;
+ 
+             mAttachInfo.mUnbufferedDispatchRequested = false;
+@@ -5969,6 +5992,8 @@ public final class ViewRootImpl implements ViewParent,
+         } else {
+             final MotionEvent motionEvent = (MotionEvent)event;
+             final int action = motionEvent.getAction();
++
++            Log.i(TAG, "isTerminalInputEvent(action).." + action);
+             return action == MotionEvent.ACTION_UP
+                     || action == MotionEvent.ACTION_CANCEL
+                     || action == MotionEvent.ACTION_HOVER_EXIT;
+@@ -6343,6 +6368,9 @@ public final class ViewRootImpl implements ViewParent,
+         if (mView == null || mStopped || mPausedForTransition) {
+             return false;
+         }
++        Log.i("XUJAY....", "requestSendAccessibilityEvent line:"
++              + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+         // Intercept accessibility focus events fired by virtual nodes to keep
+         // track of accessibility focus position in such nodes.
+         final int eventType = event.getEventType();
+@@ -6386,6 +6414,10 @@ public final class ViewRootImpl implements ViewParent,
+                 handleWindowContentChangedEvent(event);
+             } break;
+         }
++
++        Log.i("XUJAY....", "requestSendAccessibilityEvent line:"
++              + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+         mAccessibilityManager.sendAccessibilityEvent(event);
+         return true;
+     }
+@@ -6980,6 +7012,7 @@ public final class ViewRootImpl implements ViewParent,
+             if (!registered) {
+                 mAttachInfo.mAccessibilityWindowId =
+                         mAccessibilityManager.addAccessibilityInteractionConnection(mWindow,
++                                mBasePackageName,
+                                 new AccessibilityInteractionConnection(ViewRootImpl.this));
+             }
+         }
+@@ -7024,6 +7057,15 @@ public final class ViewRootImpl implements ViewParent,
+         }
+ 
+         @Override
++        public void setAppBackgroundAlive(String appName) {
++            Log.i("XUJAY_API", "setAppBackgroundAlive");
++            ArraySet<String> bgApps = WindowManagerGlobal.getInstance().getBackgroundApps();
++            
++            
++        }
++
++
++        @Override
+         public void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId,
+                 Region interactiveRegion, int interactionId,
+                 IAccessibilityInteractionConnectionCallback callback, int flags,
+@@ -7064,6 +7106,39 @@ public final class ViewRootImpl implements ViewParent,
+             }
+         }
+ 
++
++        @Override
++        public Bitmap requestSnapshot(long accessibilityNodeId, Bundle bundle, int interactionId,
++                                      IAccessibilityInteractionConnectionCallback callback, int flags,
++                                      int interrogatingPid, long interrogatingTid) {
++            ViewRootImpl viewRootImpl = mViewRootImpl.get();
++
++            Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....BEGIN");
++            if (viewRootImpl != null && viewRootImpl.mView != null) {
++                Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....START");
++                // viewRootImpl.getAccessibilityInteractionController()
++                //         .requestSnapshotClientThread(accessibilityNodeId,
++                //                                      bundle, interactionId, callback, flags,
++                //                                      interrogatingPid, interrogatingTid);
++                return viewRootImpl.getAccessibilityInteractionController()
++                        .getSnapshot(accessibilityNodeId,
++                                     bundle, interactionId, callback, flags,
++                                     interrogatingPid, interrogatingTid);
++            } else {
++                // We cannot make the call and notify the caller so it does not wait.
++                try {
++                    //callback.setFindAccessibilityNodeInfoResult(null, interactionId);
++                    Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....failed");
++                    callback.setRequestSnapshotResult(false, interactionId);
++
++                } catch (RemoteException re) {
++                    /* best effort - ignore */
++                }
++            }
++            return null;
++        }
++
++
+         @Override
+         public void findAccessibilityNodeInfosByViewId(long accessibilityNodeId,
+                 String viewId, Region interactiveRegion, int interactionId,
+diff --git a/core/java/android/view/WindowManagerGlobal.java b/core/java/android/view/WindowManagerGlobal.java
+index 606168c..2bec0cf 100644
+--- a/core/java/android/view/WindowManagerGlobal.java
++++ b/core/java/android/view/WindowManagerGlobal.java
+@@ -111,6 +111,9 @@ public final class WindowManagerGlobal {
+             new ArrayList<WindowManager.LayoutParams>();
+     private final ArraySet<View> mDyingViews = new ArraySet<View>();
+ 
++    // XUJAY: keep track of background active apps by their names
++    private final ArraySet<String> mBgActiveApps = new ArraySet<String>();
++
+     private Runnable mSystemPropertyUpdater;
+ 
+     private WindowManagerGlobal() {
+@@ -145,6 +148,22 @@ public final class WindowManagerGlobal {
+         }
+     }
+ 
++    public static boolean isActiveEvenInBackground(String pkgName) {
++        IWindowManager windowManager = getWindowManagerService();
++
++        boolean result = false;
++        synchronized (WindowManagerGlobal.class) {
++            try {
++                windowManager = getWindowManagerService();
++                result = windowManager.isActiveEvenInBackground(pkgName);
++            } catch (RemoteException e) {
++                Log.e(TAG, "Failed to open window session", e);
++            }
++        }
++        return result;
++    }
++
++
+     public static IWindowSession getWindowSession() {
+         synchronized (WindowManagerGlobal.class) {
+             if (sWindowSession == null) {
+@@ -553,6 +572,14 @@ public final class WindowManagerGlobal {
+         }
+     }
+ 
++
++    public ArraySet<String> getBackgroundApps() {
++        synchronized (mLock) {
++            return null;
++
++        }
++    }
++
+     public void reportNewConfiguration(Configuration config) {
+         synchronized (mLock) {
+             int count = mViews.size();
+diff --git a/core/java/android/view/WindowManagerInternal.java b/core/java/android/view/WindowManagerInternal.java
+index 7b4640b..1d75f53 100644
+--- a/core/java/android/view/WindowManagerInternal.java
++++ b/core/java/android/view/WindowManagerInternal.java
+@@ -23,6 +23,7 @@ import android.os.IBinder;
+ import android.view.animation.Animation;
+ 
+ import java.util.List;
++import android.util.ArraySet;
+ 
+ /**
+  * Window manager local system service interface.
+@@ -43,6 +44,7 @@ public abstract class WindowManagerInternal {
+          * @param windows The windows for accessibility.
+          */
+         public void onWindowsForAccessibilityChanged(List<WindowInfo> windows);
++
+     }
+ 
+     /**
+@@ -172,6 +174,19 @@ public abstract class WindowManagerInternal {
+             WindowsForAccessibilityCallback callback);
+ 
+     /**
++     * Set the specified app to be active even in background status.
++     *
++     * @param appName The name of the app to be background.
++     */
++    public abstract void setAppBackgroundAlive(String appName);
++
++    /**
++     * Return the apps list that are in background.
++     *
++     */
++    public abstract ArraySet<String> getBackgroundApps();
++
++    /**
+      * Sets a filter for manipulating the input event stream.
+      *
+      * @param filter The filter implementation.
+diff --git a/core/java/android/view/accessibility/AccessibilityCache.java b/core/java/android/view/accessibility/AccessibilityCache.java
+index d0dde00..241f3eb 100644
+--- a/core/java/android/view/accessibility/AccessibilityCache.java
++++ b/core/java/android/view/accessibility/AccessibilityCache.java
+@@ -18,6 +18,7 @@ package android.view.accessibility;
+ 
+ import android.os.Build;
+ import android.util.ArraySet;
++import android.util.ArrayMap;
+ import android.util.Log;
+ import android.util.LongArray;
+ import android.util.LongSparseArray;
+@@ -34,7 +35,7 @@ final class AccessibilityCache {
+ 
+     private static final String LOG_TAG = "AccessibilityCache";
+ 
+-    private static final boolean DEBUG = false;
++    private static final boolean DEBUG = true;  // XUJAY
+ 
+     private static final boolean CHECK_INTEGRITY = "eng".equals(Build.TYPE);
+ 
+@@ -52,10 +53,15 @@ final class AccessibilityCache {
+     private final SparseArray<AccessibilityWindowInfo> mTempWindowArray =
+             new SparseArray<>();
+ 
++    // Created for UIWear
++    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
++    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
++
+     public void addWindow(AccessibilityWindowInfo window) {
+         synchronized (mLock) {
+             if (DEBUG) {
+-                Log.i(LOG_TAG, "Caching window: " + window.getId());
++                //Log.i(LOG_TAG, "Caching window: " + window.getId());
++                Log.i("XUJAY....", "Caching window: " + window.getId());
+             }
+             final int windowId = window.getId();
+             AccessibilityWindowInfo oldWindow = mWindowCache.get(windowId);
+@@ -63,6 +69,10 @@ final class AccessibilityCache {
+                 oldWindow.recycle();
+             }
+             mWindowCache.put(windowId, AccessibilityWindowInfo.obtain(window));
++            
++            String appName = window.getPackageName();
++            Log.i("XUJAY....", "window.getPackageName() is " + appName);
++            mWindowIdCache.put(windowId, appName);
+         }
+     }
+ 
+@@ -139,20 +149,33 @@ final class AccessibilityCache {
+         if (DEBUG) {
+             Log.i(LOG_TAG, "Refreshing cached node.");
+         }
+-
++        // for (int i = 0; i < mWindowCache.size(); ++i) {
++        //     String pkgName = "";
++        //     AccessibilityWindowInfo winfo = mWindowCache.valueAt(i);
++        //     if (winfo.getRoot() != null && winfo.getRoot().getPackageName() != null) {
++        //         pkgName = winfo.getRoot().getPackageName().toString();
++        //     }
++        //     Log.i("XUJAY....", "refreshCachedNodeLocked.....windowIds " + mWindowCache.keyAt(i)
++        //           + "\t " + mWindowCache.valueAt(i) + "\t" + "pkgName:" + pkgName);
++        // }
++
++        Log.i("XUJAY....", "refreshCachedNodeLocked.....1, windowId " + windowId);
+         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
+         if (nodes == null) {
+             return;
+         }
++        Log.i("XUJAY....", "refreshCachedNodeLocked.....2");
+         AccessibilityNodeInfo cachedInfo = nodes.get(sourceId);
+         // If the source is not in the cache - nothing to do.
+         if (cachedInfo == null) {
+             return;
+         }
++        Log.i("XUJAY....", "refreshCachedNodeLocked.....3");
+         // The node changed so we will just refresh it right now.
+         if (cachedInfo.refresh(true)) {
+             return;
+         }
++        Log.i("XUJAY....", "refreshCachedNodeLocked.....4");
+         // Weird, we could not refresh. Just evict the entire sub-tree.
+         clearSubTreeLocked(windowId, sourceId);
+     }
+@@ -281,15 +304,36 @@ final class AccessibilityCache {
+                 Log.i(LOG_TAG, "clear()");
+             }
+             final int windowCount = mWindowCache.size();
++            int datepickerWindowId = -1;  /// TODO, change here....
++
++            Log.i("XUJAY....AccessibilityCache.clear", "mWindowIdCache.size() " + mWindowIdCache.size());
++            for (int i = 0; i < mWindowIdCache.size(); ++i) {
++                Log.i("XUJAY....AccessibilityCache.clear", "traversing "
++                      + i + "-th key=" + mWindowIdCache.keyAt(i)
++                      + " value=" + mWindowIdCache.valueAt(i));
++            }
++            
+             for (int i = windowCount - 1; i >= 0; i--) {
+                 AccessibilityWindowInfo window = mWindowCache.valueAt(i);
+-                window.recycle();
+-                mWindowCache.removeAt(i);
++                final int windowId = mWindowCache.keyAt(i);
++                String appName = mWindowIdCache.get(windowId);
++                if (appName != null && mBgActiveAppSet.contains(appName)) {
++                    Log.i("XUJAY....AccessibilityCache.clear", "window belongs to app " + appName
++                          + ", windowID: " + mWindowCache.keyAt(i));
++                    datepickerWindowId = mWindowCache.keyAt(i);
++                } else {
++                    Log.i("XUJAY....AccessibilityCache.clear", "Now Remove window " + window);
++                    window.recycle();
++                    mWindowCache.removeAt(i);
++                }
+             }
+             final int nodesForWindowCount = mNodeCache.size();
+             for (int i = 0; i < nodesForWindowCount; i++) {
+                 final int windowId = mNodeCache.keyAt(i);
+-                clearNodesForWindowLocked(windowId);
++
++                if (windowId != datepickerWindowId) {
++                    clearNodesForWindowLocked(windowId);
++                }
+             }
+ 
+             mAccessibilityFocus = AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
+@@ -301,6 +345,7 @@ final class AccessibilityCache {
+         if (DEBUG) {
+             Log.i(LOG_TAG, "clearNodesForWindowLocked(" + windowId + ")");
+         }
++
+         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
+         if (nodes == null) {
+             return;
+@@ -309,6 +354,9 @@ final class AccessibilityCache {
+         final int nodeCount = nodes.size();
+         for (int i = nodeCount - 1; i >= 0; i--) {
+             AccessibilityNodeInfo info = nodes.valueAt(i);
++            if (DEBUG) {
++                Log.i(LOG_TAG, "[XUJAY]Remove Node: " + info);
++            }
+             nodes.removeAt(i);
+             info.recycle();
+         }
+@@ -319,13 +367,47 @@ final class AccessibilityCache {
+      * Clears a subtree rooted at the node with the given id that is
+      * hosted in a given window.
+      *
++     * @param appName The name of the app that is active even on background.
++     */
++    public void addBackgroundAppRecord(String appName) {
++        synchronized (mLock) {
++            mBgActiveAppSet.add(appName);
++        }
++    }
++
++
++    /**
++     * Clears a subtree rooted at the node with the given id that is
++     * hosted in a given window.
++     *
+      * @param windowId The id of the hosting window.
+      * @param rootNodeId The root id.
+      */
+     private void clearSubTreeLocked(int windowId, long rootNodeId) {
+         if (DEBUG) {
+-            Log.i(LOG_TAG, "Clearing cached subtree.");
++            Log.i(LOG_TAG, "Clearing cached subtree. windowId: " + windowId
++                  + " , rootNodeId: " + rootNodeId);
+         }
++        /////////////////////XUJAY//////////////////////
++        {
++            LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
++            if (nodes == null) {
++                return;
++            }
++            AccessibilityNodeInfo current = nodes.get(rootNodeId);
++            if (current == null) {
++                return;
++            }
++            if (current.getPackageName() != null) {
++                String appName = current.getPackageName().toString();
++                if (mBgActiveAppSet.contains(appName)) {
++                    Log.i("XUJAY....", "Skip the clearSubTreeLocked");
++                    return;
++                }
++            }
++        }
++        /////////////////////XUJAY//////////////////////
++
+         LongSparseArray<AccessibilityNodeInfo> nodes = mNodeCache.get(windowId);
+         if (nodes != null) {
+             clearSubTreeRecursiveLocked(nodes, rootNodeId);
+diff --git a/core/java/android/view/accessibility/AccessibilityInteractionClient.java b/core/java/android/view/accessibility/AccessibilityInteractionClient.java
+index b49cbc6..43f8deb 100644
+--- a/core/java/android/view/accessibility/AccessibilityInteractionClient.java
++++ b/core/java/android/view/accessibility/AccessibilityInteractionClient.java
+@@ -24,6 +24,7 @@ import android.os.Message;
+ import android.os.Process;
+ import android.os.RemoteException;
+ import android.os.SystemClock;
++import android.graphics.Bitmap;
+ import android.util.Log;
+ import android.util.LongSparseArray;
+ import android.util.SparseArray;
+@@ -285,6 +286,7 @@ public final class AccessibilityInteractionClient
+                         Log.i(LOG_TAG, "Node cache miss");
+                     }
+                 }
++                Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 1");
+                 final int interactionId = mInteractionIdCounter.getAndIncrement();
+                 final long identityToken = Binder.clearCallingIdentity();
+                 final boolean success = connection.findAccessibilityNodeInfoByAccessibilityId(
+@@ -293,10 +295,12 @@ public final class AccessibilityInteractionClient
+                 Binder.restoreCallingIdentity(identityToken);
+                 // If the scale is zero the call has failed.
+                 if (success) {
++                    Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 2");
+                     List<AccessibilityNodeInfo> infos = getFindAccessibilityNodeInfosResultAndClear(
+                             interactionId);
+                     finalizeAndCacheAccessibilityNodeInfos(infos, connectionId);
+                     if (infos != null && !infos.isEmpty()) {
++                        Log.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....client 3");
+                         return infos.get(0);
+                     }
+                 }
+@@ -309,6 +313,8 @@ public final class AccessibilityInteractionClient
+             Log.e(LOG_TAG, "Error while calling remote"
+                     + " findAccessibilityNodeInfoByAccessibilityId", re);
+         }
++        Log.e("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId....connection error!");
++
+         return null;
+     }
+ 
+@@ -535,6 +541,34 @@ public final class AccessibilityInteractionClient
+         return false;
+     }
+ 
++    /**
++     * XUJAY:
++     * request for the snapshot of current node
++     *
++     */
++    public Bitmap requestSnapshot(int connectionId, int accessibilityWindowId,
++                                long accessibilityNodeId, Bundle bundle) {
++        try {
++            IAccessibilityServiceConnection connection = getConnection(connectionId);
++            if (connection != null) {
++                final int interactionId = mInteractionIdCounter.getAndIncrement();
++                long tid = Thread.currentThread().getId();
++                Log.i("SyncUI", "RequestSnapshot, AccessibilityInteractionClient........");
++                return connection.requestSnapshot(accessibilityWindowId, accessibilityNodeId,
++                                                  bundle, interactionId, this, tid);
++
++            } else {
++                if (DEBUG) {
++                    Log.w(LOG_TAG, "No connection for connection id: " + connectionId);
++                }
++            }
++        } catch (RemoteException re) {
++            Log.w(LOG_TAG, "Error while calling remote requestSnapshot", re);
++        }
++        return null;
++    }
++
++
+     public void clearCache() {
+         sAccessibilityCache.clear();
+     }
+@@ -543,6 +577,10 @@ public final class AccessibilityInteractionClient
+         sAccessibilityCache.onAccessibilityEvent(event);
+     }
+ 
++    public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
++        sAccessibilityCache.onAccessibilityEvent(event);
++    }
++
+     /**
+      * Gets the the result of an async request that returns an {@link AccessibilityNodeInfo}.
+      *
+@@ -659,6 +697,18 @@ public final class AccessibilityInteractionClient
+         mPerformAccessibilityActionResult = false;
+     }
+ 
++
++    public void setRequestSnapshotResult(boolean succeeded, int interactionId) {
++        synchronized (mInstanceLock) {
++            if (interactionId > mInteractionId) {
++
++                mInteractionId = interactionId;
++            }
++            mInstanceLock.notifyAll();
++        }
++    }
++
++
+     /**
+      * Waits up to a given bound for a result of a request and returns it.
+      *
+@@ -775,6 +825,16 @@ public final class AccessibilityInteractionClient
+     }
+ 
+     /**
++     * Add a background app record.
++     *
++     * @param appName The background app name.
++     */
++    public void addBackgroundAppRecord(String appName) {
++        sAccessibilityCache.addBackgroundAppRecord(appName);
++    }
++
++
++    /**
+      * Checks whether the infos are a fully connected tree with no duplicates.
+      *
+      * @param infos The result list to check.
+diff --git a/core/java/android/view/accessibility/AccessibilityManager.java b/core/java/android/view/accessibility/AccessibilityManager.java
+index e77b862..76cd03d 100644
+--- a/core/java/android/view/accessibility/AccessibilityManager.java
++++ b/core/java/android/view/accessibility/AccessibilityManager.java
+@@ -66,7 +66,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
+  * @see Context#ACCESSIBILITY_SERVICE
+  */
+ public final class AccessibilityManager {
+-    private static final boolean DEBUG = false;
++    private static final boolean DEBUG = true;
+ 
+     private static final String LOG_TAG = "AccessibilityManager";
+ 
+@@ -570,7 +570,7 @@ public final class AccessibilityManager {
+      *
+      * @hide
+      */
+-    public int addAccessibilityInteractionConnection(IWindow windowToken,
++    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
+             IAccessibilityInteractionConnection connection) {
+         final IAccessibilityManager service;
+         final int userId;
+@@ -582,7 +582,7 @@ public final class AccessibilityManager {
+             userId = mUserId;
+         }
+         try {
+-            return service.addAccessibilityInteractionConnection(windowToken, connection, userId);
++            return service.addAccessibilityInteractionConnection(windowToken, appName, connection, userId);
+         } catch (RemoteException re) {
+             Log.e(LOG_TAG, "Error while adding an accessibility interaction connection. ", re);
+         }
+diff --git a/core/java/android/view/accessibility/AccessibilityNodeInfo.java b/core/java/android/view/accessibility/AccessibilityNodeInfo.java
+index 86ed499..35ab350 100644
+--- a/core/java/android/view/accessibility/AccessibilityNodeInfo.java
++++ b/core/java/android/view/accessibility/AccessibilityNodeInfo.java
+@@ -19,6 +19,7 @@ package android.view.accessibility;
+ import android.accessibilityservice.AccessibilityServiceInfo;
+ import android.annotation.Nullable;
+ import android.graphics.Rect;
++import android.graphics.Bitmap;
+ import android.os.Bundle;
+ import android.os.Parcel;
+ import android.os.Parcelable;
+@@ -28,6 +29,7 @@ import android.util.ArraySet;
+ import android.util.LongArray;
+ import android.util.Pools.SynchronizedPool;
+ import android.view.View;
++import android.util.Log;
+ 
+ import com.android.internal.R;
+ 
+@@ -535,6 +537,20 @@ public class AccessibilityNodeInfo implements Parcelable {
+     private static final int VIRTUAL_DESCENDANT_ID_SHIFT = 32;
+ 
+     /**
++     * XUJAY:
++     * The stable ID of this view for accessibility purposes.
++     */
++    private int mAccessibilityViewId = -1;
++
++    public void setAccessibilityViewId(int nodeId) {
++        mAccessibilityViewId = nodeId;
++    }
++
++    public int getAccessibilityViewId() {
++        return mAccessibilityViewId;
++    }
++
++    /**
+      * Gets the accessibility view id which identifies a View in the view three.
+      *
+      * @param accessibilityNodeId The id of an {@link AccessibilityNodeInfo}.
+@@ -628,6 +644,9 @@ public class AccessibilityNodeInfo implements Parcelable {
+     private CollectionInfo mCollectionInfo;
+     private CollectionItemInfo mCollectionItemInfo;
+ 
++    // XUJAY: added for createSnapshot
++    private View mView;
++
+     /**
+      * Hide constructor from clients.
+      */
+@@ -635,6 +654,14 @@ public class AccessibilityNodeInfo implements Parcelable {
+         /* do nothing */
+     }
+ 
++    public void setView(View view) {
++        mView = view;
++    }
++
++    public View getView() {
++        return mView;
++    }
++
+     /**
+      * Sets the source.
+      * <p>
+@@ -746,12 +773,14 @@ public class AccessibilityNodeInfo implements Parcelable {
+     public boolean refresh(boolean bypassCache) {
+         enforceSealed();
+         if (!canPerformRequestOverConnection(mSourceNodeId)) {
++            Log.i("XUJAY....", "!canPerformRequestOverConnection(mSourceNodeId)");
+             return false;
+         }
+         AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+         AccessibilityNodeInfo refreshedInfo = client.findAccessibilityNodeInfoByAccessibilityId(
+                 mConnectionId, mWindowId, mSourceNodeId, bypassCache, 0);
+         if (refreshedInfo == null) {
++            Log.i("XUJAY....", "refreshedInfo == null");
+             return false;
+         }
+         init(refreshedInfo);
+@@ -1289,6 +1318,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+      */
+     public boolean performAction(int action) {
+         enforceSealed();
++        Log.i("XUJAY....", "!canPerformRequestOverConnection(mSourceNodeId)" + !canPerformRequestOverConnection(mSourceNodeId));
+         if (!canPerformRequestOverConnection(mSourceNodeId)) {
+             return false;
+         }
+@@ -1320,6 +1350,26 @@ public class AccessibilityNodeInfo implements Parcelable {
+                 action, arguments);
+     }
+ 
++
++    /**
++     * XUJAY:
++     * request for the snapshot of current node
++     *
++     */
++    public Bitmap requestSnapshot(Bundle bundle) {
++        if (bundle == null) {
++            return null;
++        }
++        enforceSealed();
++        if (!canPerformRequestOverConnection(mSourceNodeId)) {
++            return null;
++        }
++        Log.i("SyncUI", "RequestSnapshot, AccessibilityNodeInfo......." + mAccessibilityViewId);
++        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
++        return client.requestSnapshot(mConnectionId, mWindowId, mAccessibilityViewId, bundle);
++    }
++
++
+     /**
+      * Finds {@link AccessibilityNodeInfo}s by text. The match is case
+      * insensitive containment. The search is relative to this info i.e.
+@@ -2636,6 +2686,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+      */
+     @Override
+     public void writeToParcel(Parcel parcel, int flags) {
++        parcel.writeInt(mAccessibilityViewId);
+         parcel.writeInt(isSealed() ? 1 : 0);
+         parcel.writeLong(mSourceNodeId);
+         parcel.writeInt(mWindowId);
+@@ -2758,6 +2809,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+      * @param other The other instance.
+      */
+     private void init(AccessibilityNodeInfo other) {
++        mAccessibilityViewId = other.mAccessibilityViewId;  // XUJAY
+         mSealed = other.mSealed;
+         mSourceNodeId = other.mSourceNodeId;
+         mParentNodeId = other.mParentNodeId;
+@@ -2821,6 +2873,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+      * @param parcel A parcel containing the state of a {@link AccessibilityNodeInfo}.
+      */
+     private void initFromParcel(Parcel parcel) {
++        mAccessibilityViewId = parcel.readInt();
+         final boolean sealed = (parcel.readInt()  == 1);
+         mSourceNodeId = parcel.readLong();
+         mWindowId = parcel.readInt();
+@@ -2919,6 +2972,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+      * Clears the state of this instance.
+      */
+     private void clear() {
++        mAccessibilityViewId = -1;
+         mSealed = false;
+         mSourceNodeId = ROOT_NODE_ID;
+         mParentNodeId = ROOT_NODE_ID;
+@@ -2936,7 +2990,7 @@ public class AccessibilityNodeInfo implements Parcelable {
+         mBoundsInParent.set(0, 0, 0, 0);
+         mBoundsInScreen.set(0, 0, 0, 0);
+         mBooleanProperties = 0;
+-        mPackageName = null;
++
+         mClassName = null;
+         mText = null;
+         mError = null;
+@@ -2950,8 +3004,14 @@ public class AccessibilityNodeInfo implements Parcelable {
+         mInputType = InputType.TYPE_NULL;
+         mLiveRegion = View.ACCESSIBILITY_LIVE_REGION_NONE;
+         if (mExtras != null) {
++            Bitmap bitmap = (Bitmap) mExtras.get(mPackageName.toString());
++            if (bitmap != null) {
++                bitmap.recycle();
++                bitmap = null;
++            }
+             mExtras.clear();
+         }
++        mPackageName = null;
+         if (mRangeInfo != null) {
+             mRangeInfo.recycle();
+             mRangeInfo = null;
+diff --git a/core/java/android/view/accessibility/AccessibilityWindowInfo.java b/core/java/android/view/accessibility/AccessibilityWindowInfo.java
+index a75e8a7..af84488 100644
+--- a/core/java/android/view/accessibility/AccessibilityWindowInfo.java
++++ b/core/java/android/view/accessibility/AccessibilityWindowInfo.java
+@@ -85,12 +85,31 @@ public final class AccessibilityWindowInfo implements Parcelable {
+     private LongArray mChildIds;
+ 
+     private int mConnectionId = UNDEFINED;
++    private String mPackageName = "";  // To mark which app(package) this window belongs to.
+ 
+     private AccessibilityWindowInfo() {
+         /* do nothing - hide constructor */
+     }
+ 
+     /**
++     * Gets the package name that the window belongs to.
++     *
++     * @return The package name string.
++     *
++     */
++    public String getPackageName() {
++        return mPackageName;
++    }
++
++    /**
++     * Sets the package name that the window belongs to.
++     *
++     */
++    public void setPackageName(String pkgName) {
++        mPackageName = new String(pkgName);
++    }
++
++    /**
+      * Gets the type of the window.
+      *
+      * @return The type.
+@@ -364,6 +383,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
+         infoClone.mId = info.mId;
+         infoClone.mParentId = info.mParentId;
+         infoClone.mBoundsInScreen.set(info.mBoundsInScreen);
++        infoClone.mPackageName = info.mPackageName;
+ 
+         if (info.mChildIds != null && info.mChildIds.size() > 0) {
+             if (infoClone.mChildIds == null) {
+@@ -417,6 +437,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
+         }
+ 
+         parcel.writeInt(mConnectionId);
++        parcel.writeString(mPackageName);
+     }
+ 
+     private void initFromParcel(Parcel parcel) {
+@@ -439,6 +460,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
+         }
+ 
+         mConnectionId = parcel.readInt();
++        mPackageName = parcel.readString();
+     }
+ 
+     @Override
+@@ -491,6 +513,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
+             builder.append(", hasChildren=").append(mChildIds != null
+                     && mChildIds.size() > 0);
+         }
++        builder.append(", packageName=" + mPackageName);
+         builder.append(']');
+         return builder.toString();
+     }
+@@ -509,6 +532,7 @@ public final class AccessibilityWindowInfo implements Parcelable {
+             mChildIds.clear();
+         }
+         mConnectionId = UNDEFINED;
++        mPackageName = "";
+     }
+ 
+     /**
+diff --git a/core/java/android/view/accessibility/IAccessibilityInteractionConnection.aidl b/core/java/android/view/accessibility/IAccessibilityInteractionConnection.aidl
+index cecc4af..37f9785 100644
+--- a/core/java/android/view/accessibility/IAccessibilityInteractionConnection.aidl
++++ b/core/java/android/view/accessibility/IAccessibilityInteractionConnection.aidl
+@@ -18,6 +18,7 @@ package android.view.accessibility;
+ 
+ import android.graphics.Region;
+ import android.graphics.Point;
++import android.graphics.Bitmap;
+ import android.os.Bundle;
+ import android.view.MagnificationSpec;
+ import android.view.accessibility.AccessibilityNodeInfo;
+@@ -29,29 +30,35 @@ import android.view.accessibility.IAccessibilityInteractionConnectionCallback;
+  *
+  * @hide
+  */
+-oneway interface IAccessibilityInteractionConnection {
++interface IAccessibilityInteractionConnection {
+ 
+-    void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId, in Region bounds,
++   oneway void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId, in Region bounds,
+         int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+         int interrogatingPid, long interrogatingTid, in MagnificationSpec spec);
+ 
+-    void findAccessibilityNodeInfosByViewId(long accessibilityNodeId, String viewId,
++   oneway void findAccessibilityNodeInfosByViewId(long accessibilityNodeId, String viewId,
+         in Region bounds, int interactionId, IAccessibilityInteractionConnectionCallback callback,
+         int flags, int interrogatingPid, long interrogatingTid, in MagnificationSpec spec);
+ 
+-    void findAccessibilityNodeInfosByText(long accessibilityNodeId, String text, in Region bounds,
++   oneway void findAccessibilityNodeInfosByText(long accessibilityNodeId, String text, in Region bounds,
+         int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+         int interrogatingPid, long interrogatingTid, in MagnificationSpec spec);
+ 
+-    void findFocus(long accessibilityNodeId, int focusType, in Region bounds, int interactionId,
++   oneway void findFocus(long accessibilityNodeId, int focusType, in Region bounds, int interactionId,
+         IAccessibilityInteractionConnectionCallback callback, int flags, int interrogatingPid,
+         long interrogatingTid, in MagnificationSpec spec);
+ 
+-    void focusSearch(long accessibilityNodeId, int direction, in Region bounds, int interactionId,
++   oneway void focusSearch(long accessibilityNodeId, int direction, in Region bounds, int interactionId,
+         IAccessibilityInteractionConnectionCallback callback, int flags, int interrogatingPid,
+         long interrogatingTid, in MagnificationSpec spec);
+ 
+-    void performAccessibilityAction(long accessibilityNodeId, int action, in Bundle arguments,
++   oneway void performAccessibilityAction(long accessibilityNodeId, int action, in Bundle arguments,
+         int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+         int interrogatingPid, long interrogatingTid);
++
++   oneway void setAppBackgroundAlive(String appName);
++
++   Bitmap requestSnapshot(long accessibilityNodeId, out Bundle bundle, int interactionId,
++                          IAccessibilityInteractionConnectionCallback callback, int flags,
++                          int interrogatingPid, long interrogatingTid);
+ }
+diff --git a/core/java/android/view/accessibility/IAccessibilityInteractionConnectionCallback.aidl b/core/java/android/view/accessibility/IAccessibilityInteractionConnectionCallback.aidl
+index 42ae1b3..20e6234 100644
+--- a/core/java/android/view/accessibility/IAccessibilityInteractionConnectionCallback.aidl
++++ b/core/java/android/view/accessibility/IAccessibilityInteractionConnectionCallback.aidl
+@@ -52,4 +52,6 @@ oneway interface IAccessibilityInteractionConnectionCallback {
+      * @param interactionId The interaction id to match the result with the request.
+      */
+     void setPerformAccessibilityActionResult(boolean succeeded, int interactionId);
++
++    void setRequestSnapshotResult(boolean succeeded, int interactionId);
+ }
+diff --git a/core/java/android/view/accessibility/IAccessibilityManager.aidl b/core/java/android/view/accessibility/IAccessibilityManager.aidl
+index b6570cc..91e78e9 100644
+--- a/core/java/android/view/accessibility/IAccessibilityManager.aidl
++++ b/core/java/android/view/accessibility/IAccessibilityManager.aidl
+@@ -45,7 +45,7 @@ interface IAccessibilityManager {
+ 
+     void interrupt(int userId);
+ 
+-    int addAccessibilityInteractionConnection(IWindow windowToken,
++    int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
+         in IAccessibilityInteractionConnection connection, int userId);
+ 
+     void removeAccessibilityInteractionConnection(IWindow windowToken);
+diff --git a/core/jni/android_view_InputEventSender.cpp b/core/jni/android_view_InputEventSender.cpp
+index 3bd6917..505f118 100644
+--- a/core/jni/android_view_InputEventSender.cpp
++++ b/core/jni/android_view_InputEventSender.cpp
+@@ -281,6 +281,9 @@ static jboolean nativeSendKeyEvent(JNIEnv* env, jclass clazz, jlong senderPtr,
+ 
+ static jboolean nativeSendMotionEvent(JNIEnv* env, jclass clazz, jlong senderPtr,
+         jint seq, jobject eventObj) {
++
++    ALOGI("JNI nativeSendMotionEvent...JX.......................");
++
+     sp<NativeInputEventSender> sender =
+             reinterpret_cast<NativeInputEventSender*>(senderPtr);
+     MotionEvent* event = android_view_MotionEvent_getNativePtr(env, eventObj);
+diff --git a/core/jni/android_view_InputQueue.cpp b/core/jni/android_view_InputQueue.cpp
+index 96ccdee..5ad715d 100644
+--- a/core/jni/android_view_InputQueue.cpp
++++ b/core/jni/android_view_InputQueue.cpp
+@@ -132,6 +132,7 @@ void InputQueue::finishEvent(InputEvent* event, bool handled) {
+ }
+ 
+ void InputQueue::handleMessage(const Message& message) {
++    ALOGI("InputQueue::handleMessage.......................");
+     switch(message.what) {
+     case MSG_FINISH_INPUT:
+         JNIEnv* env = AndroidRuntime::getJNIEnv();
+diff --git a/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java b/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
+index 57769e7..fe61f6d 100644
+--- a/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
++++ b/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
+@@ -43,6 +43,7 @@ import android.database.ContentObserver;
+ import android.graphics.Point;
+ import android.graphics.Rect;
+ import android.graphics.Region;
++import android.graphics.Bitmap;
+ import android.hardware.display.DisplayManager;
+ import android.hardware.input.InputManager;
+ import android.net.Uri;
+@@ -67,6 +68,7 @@ import android.util.Pools.Pool;
+ import android.util.Pools.SimplePool;
+ import android.util.Slog;
+ import android.util.SparseArray;
++import android.util.ArraySet;
+ import android.view.Display;
+ import android.view.IWindow;
+ import android.view.InputDevice;
+@@ -118,7 +120,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
+  */
+ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+ 
+-    private static final boolean DEBUG = false;
++    private static final boolean DEBUG = true;
+ 
+     private static final String LOG_TAG = "AccessibilityManagerService";
+ 
+@@ -214,6 +216,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+ 
+     private WindowsForAccessibilityCallback mWindowsForAccessibilityCallback;
+ 
++    // Created for UIWear
++    private final ArraySet<String> mBgActiveAppSet = new ArraySet<>();
++    private final SparseArray<String> mWindowIdCache = new SparseArray<>();
++
+     private UserState getCurrentUserStateLocked() {
+         return getUserStateLocked(mCurrentUserId);
+     }
+@@ -422,11 +428,19 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+             // performs the current profile parent resolution..
+             final int resolvedUserId = mSecurityPolicy
+                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
++
++            Slog.i("XUJAY....", "sendAccessibilityEvent line:"
++                   + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+             // This method does nothing for a background user.
+             if (resolvedUserId != mCurrentUserId) {
++                Slog.i("XUJAY....", "sendAccessibilityEvent() recycle the event");
+                 return true; // yes, recycle the event
+             }
+             if (mSecurityPolicy.canDispatchAccessibilityEventLocked(event)) {
++                Slog.i("XUJAY....", "sendAccessibilityEvent line:"
++                       + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+                 mSecurityPolicy.updateActiveAndAccessibilityFocusedWindowLocked(event.getWindowId(),
+                         event.getSourceNodeId(), event.getEventType());
+                 mSecurityPolicy.updateEventSourceLocked(event);
+@@ -434,12 +448,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                 notifyAccessibilityServicesDelayedLocked(event, true);
+             }
+             if (mHasInputFilter && mInputFilter != null) {
++                Slog.i("XUJAY....", "sendAccessibilityEvent line:"
++                       + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+                 mMainHandler.obtainMessage(MainHandler.MSG_SEND_ACCESSIBILITY_EVENT_TO_INPUT_FILTER,
+                         AccessibilityEvent.obtain(event)).sendToTarget();
+             }
+             event.recycle();
+             getUserStateLocked(resolvedUserId).mHandledFeedbackTypes = 0;
+         }
++
++        Slog.i("XUJAY....", "sendAccessibilityEvent return: " + (OWN_PROCESS_ID != Binder.getCallingPid()));
+         return (OWN_PROCESS_ID != Binder.getCallingPid());
+     }
+ 
+@@ -528,7 +547,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+     }
+ 
+     @Override
+-    public int addAccessibilityInteractionConnection(IWindow windowToken,
++    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
+             IAccessibilityInteractionConnection connection, int userId) throws RemoteException {
+         synchronized (mLock) {
+             // We treat calls from a profile as if made by its parent as profiles
+@@ -537,6 +556,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+             final int resolvedUserId = mSecurityPolicy
+                     .resolveCallingUserIdEnforcingPermissionsLocked(userId);
+             final int windowId = sNextWindowId++;
++
++            mWindowIdCache.put(windowId, appName);
++            Slog.i("XUJAY....", "addAccessibilityInteractionConnection " + windowId + ", " + appName);
++
+             // If the window is from a process that runs across users such as
+             // the system UI or the system we add it to the global state that
+             // is shared across users.
+@@ -1042,6 +1065,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+      */
+     private void notifyAccessibilityServicesDelayedLocked(AccessibilityEvent event,
+             boolean isDefault) {
++
++        Slog.i("XUJAY....", "notifyAccessibilityServicesDelayedLocked line:"
++               + Thread.currentThread().getStackTrace()[2].getLineNumber());
++
+         try {
+             UserState state = getCurrentUserStateLocked();
+             for (int i = 0, count = state.mBoundServices.size(); i < count; i++) {
+@@ -1051,6 +1078,8 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                     if (canDispatchEventToServiceLocked(service, event,
+                             state.mHandledFeedbackTypes)) {
+                         state.mHandledFeedbackTypes |= service.mFeedbackType;
++                        Slog.i("XUJAY....", "notifyAccessibilityServicesDelayedLocked line:"
++                               + Thread.currentThread().getStackTrace()[2].getLineNumber());
+                         service.notifyAccessibilityEvent(event);
+                     }
+                 }
+@@ -2358,20 +2387,24 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                 // We treat calls from a profile as if made by its parent as profiles
+                 // share the accessibility state of the parent. The call below
+                 // performs the current profile parent resolution.
++                Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......0");
+                 final int resolvedUserId = mSecurityPolicy
+                         .resolveCallingUserIdEnforcingPermissionsLocked(
+                                 UserHandle.USER_CURRENT);
+                 if (resolvedUserId != mCurrentUserId) {
++                    Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......1");
+                     return false;
+                 }
+                 resolvedWindowId = resolveAccessibilityWindowIdLocked(accessibilityWindowId);
+                 final boolean permissionGranted =
+                     mSecurityPolicy.canGetAccessibilityNodeInfoLocked(this, resolvedWindowId);
+                 if (!permissionGranted) {
++                    Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......2");
+                     return false;
+                 } else {
+                     connection = getConnectionLocked(resolvedWindowId);
+                     if (connection == null) {
++                        Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......3");
+                         return false;
+                     }
+                 }
+@@ -2388,6 +2421,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                 connection.findAccessibilityNodeInfoByAccessibilityId(accessibilityNodeId,
+                         partialInteractiveRegion, interactionId, callback, mFetchFlags | flags,
+                         interrogatingPid, interrogatingTid, spec);
++                Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......4");
+                 return true;
+             } catch (RemoteException re) {
+                 if (DEBUG) {
+@@ -2400,6 +2434,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                     partialInteractiveRegion.recycle();
+                 }
+             }
++            Slog.i("XUJAY....", "findAccessibilityNodeInfoByAccessibilityId......5");
+             return false;
+         }
+ 
+@@ -2563,6 +2598,57 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+         }
+ 
+         @Override
++        public Bitmap requestSnapshot(int accessibilityWindowId,
++                                    long accessibilityNodeId, Bundle bundle, int interactionId,
++                                    IAccessibilityInteractionConnectionCallback callback,
++                                    long interrogatingTid) {
++            Slog.i("SyncUI", "RequestSnapshot, AccessibilityManagerService.BEGIN.......");
++            final int resolvedWindowId;
++            IAccessibilityInteractionConnection connection = null;
++            Bitmap bitmap = null;
++            synchronized (mLock) {
++                // We treat calls from a profile as if made by its parent as profiles
++                // share the accessibility state of the parent. The call below
++                // performs the current profile parent resolution.
++                final int resolvedUserId = mSecurityPolicy
++                        .resolveCallingUserIdEnforcingPermissionsLocked(
++                                UserHandle.USER_CURRENT);
++                if (resolvedUserId != mCurrentUserId) {
++                    Slog.w("SyncUI", " AccessibilityManagerService....Wrong userId..");
++                    return null;
++                }
++                resolvedWindowId = resolveAccessibilityWindowIdLocked(accessibilityWindowId);
++                final boolean permissionGranted = mSecurityPolicy.canGetAccessibilityNodeInfoLocked(
++                    this, resolvedWindowId);
++                if (!permissionGranted) {
++                    Slog.w("SyncUI", " AccessibilityManagerService....permission Denied..");
++                    return null;
++                } else {
++                    connection = getConnectionLocked(resolvedWindowId);
++                    if (connection == null) {
++                        Slog.w("SyncUI", " AccessibilityManagerService....getConnectionLocked failed..");
++                        return null;
++                    }
++                }
++            }
++            final int interrogatingPid = Binder.getCallingPid();
++            final long identityToken = Binder.clearCallingIdentity();
++            try {
++                Slog.w("SyncUI", " AccessibilityManagerService.requestSnapshot.....");
++                bitmap = connection.requestSnapshot(accessibilityNodeId, bundle, interactionId, callback,
++                                                    mFetchFlags, interrogatingPid, interrogatingTid);
++            } catch (RemoteException re) {
++                if (DEBUG) {
++                    Slog.e(LOG_TAG, "Error calling requestSnapshot()");
++                }
++            } finally {
++                Binder.restoreCallingIdentity(identityToken);
++            }
++            return bitmap;
++        }
++
++
++        @Override
+         public boolean performGlobalAction(int action) {
+             synchronized (mLock) {
+                 // We treat calls from a profile as if made by its parent as profiles
+@@ -2604,6 +2690,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+         }
+ 
+         @Override
++        public boolean setAppBackgroundAlive(String appName) {
++            // Set the app called 'appName' to be active even in the background
++            mWindowManagerService.setAppBackgroundAlive(appName);
++            synchronized (mLock) {
++                mBgActiveAppSet.add(appName);
++            }
++            return true;
++        }
++        
++
++        @Override
+         public void dump(FileDescriptor fd, final PrintWriter pw, String[] args) {
+             mSecurityPolicy.enforceCallingPermission(Manifest.permission.DUMP, FUNCTION_DUMP);
+             synchronized (mLock) {
+@@ -2773,6 +2870,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+ 
+             try {
+                 listener.onAccessibilityEvent(event);
++                listener.onAccessibilityEventForBackground("hahahahaha", event);
+                 if (DEBUG) {
+                     Slog.i(LOG_TAG, "Event " + event + " sent to " + listener);
+                 }
+@@ -3139,6 +3237,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+             }
+         }
+ 
++
+         private AccessibilityWindowInfo populateReportedWindow(WindowInfo window) {
+             final int windowId = findWindowIdLocked(window.token);
+             if (windowId < 0) {
+@@ -3152,6 +3251,17 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+             reportedWindow.setLayer(window.layer);
+             reportedWindow.setFocused(window.focused);
+             reportedWindow.setBoundsInScreen(window.boundsInScreen);
++            String appName;
++            synchronized (mLock) {
++                appName = mWindowIdCache.get(windowId);
++            }
++            if (appName == null) {
++                appName = "";
++                Slog.w("XUJAY....", "Getting package name from windowId failed.");
++            } else {
++                Slog.d("XUJAY....", "Setting package name: " + appName);
++            }
++            reportedWindow.setPackageName(appName);
+ 
+             final int parentId = findWindowIdLocked(window.parentToken);
+             if (parentId >= 0) {
+@@ -3335,7 +3445,11 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+ 
+         private boolean canDispatchAccessibilityEventLocked(AccessibilityEvent event) {
+             final int eventType = event.getEventType();
++            Slog.i("XUJAY....", "canDispatchAccessibilityEventLocked(): eventType " + eventType);
+             switch (eventType) {
++                // Added by XUJAY
++                case AccessibilityEvent.TYPE_VIEW_CLICKED:
++
+                 // All events that are for changes in a global window
+                 // state should *always* be dispatched.
+                 case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
+@@ -3362,6 +3476,8 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                 // the accessibility layer reports which are windows
+                 // that a sighted user can touch.
+                 default: {
++                    Slog.i("XUJAY....", "canDispatchAccessibilityEventLocked(): default return "
++                           + isRetrievalAllowingWindow(event.getWindowId()));
+                     return isRetrievalAllowingWindow(event.getWindowId());
+                 }
+             }
+@@ -3626,6 +3742,9 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+         }
+ 
+         public boolean canGetAccessibilityNodeInfoLocked(Service service, int windowId) {
++            Slog.i("XUJAY....", "canGetAccessibilityNodeInfoLocked.....canRetrieveWindowContentLocked(service):"
++                   + canRetrieveWindowContentLocked(service) + ", isRetrievalAllowingWindow(windowId):"
++                   + isRetrievalAllowingWindow(windowId));
+             return canRetrieveWindowContentLocked(service) && isRetrievalAllowingWindow(windowId);
+         }
+ 
+@@ -3695,7 +3814,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+                     || userId == UserHandle.USER_CURRENT
+                     || userId == UserHandle.USER_CURRENT_OR_SELF);
+         }
+-
++        
+         private boolean isRetrievalAllowingWindow(int windowId) {
+             // The system gets to interact with any window it wants.
+             if (Binder.getCallingUid() == Process.SYSTEM_UID) {
+@@ -3704,6 +3823,15 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
+             if (windowId == mActiveWindowId) {
+                 return true;
+             }
++            // TODO: XUJAY
++            synchronized (mLock) {
++                String appName = mWindowIdCache.get(windowId);
++                Slog.i("XUJAY.....", "isRetrievalAllowingWindow: appName " + appName);
++                if (appName != null && mBgActiveAppSet.contains(appName)) {
++                    Slog.i("XUJAY.....", "This is a background app:" + appName + ", just skip checking it");
++                    return true;
++                }
++            }
+             return findWindowById(windowId) != null;
+         }
+ 
+diff --git a/services/core/java/com/android/server/am/ActivityManagerDebugConfig.java b/services/core/java/com/android/server/am/ActivityManagerDebugConfig.java
+index 16c959f..7f6c6c6 100644
+--- a/services/core/java/com/android/server/am/ActivityManagerDebugConfig.java
++++ b/services/core/java/com/android/server/am/ActivityManagerDebugConfig.java
+@@ -85,7 +85,9 @@ class ActivityManagerDebugConfig {
+     static final boolean DEBUG_UID_OBSERVERS = DEBUG_ALL || false;
+     static final boolean DEBUG_URI_PERMISSION = DEBUG_ALL || false;
+     static final boolean DEBUG_USER_LEAVING = DEBUG_ALL || false;
+-    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || false;
++    //XUJAY:    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || false;
++    static final boolean DEBUG_VISIBILITY = DEBUG_ALL || true;
++    
+     static final boolean DEBUG_VISIBLE_BEHIND = DEBUG_ALL_ACTIVITIES || false;
+     static final boolean DEBUG_USAGE_STATS = DEBUG_ALL || false;
+ 
+diff --git a/services/core/java/com/android/server/wm/WindowManagerService.java b/services/core/java/com/android/server/wm/WindowManagerService.java
+index 5bf0509..e5e5928 100644
+--- a/services/core/java/com/android/server/wm/WindowManagerService.java
++++ b/services/core/java/com/android/server/wm/WindowManagerService.java
+@@ -358,6 +358,9 @@ public class WindowManagerService extends IWindowManager.Stub
+      */
+     final ArraySet<Session> mSessions = new ArraySet<>();
+ 
++    // XUJAY: keep track of background active apps by their names
++    final ArraySet<String> mBgActiveApps = new ArraySet<>();
++
+     /**
+      * Mapping from an IWindow IBinder to the server's Window object.
+      * This is also used as the lock for all of our state.
+@@ -3640,6 +3643,7 @@ public class WindowManagerService extends IWindowManager.Stub
+         }
+     }
+ 
++
+     @Override
+     public void removeWindowToken(IBinder token) {
+         if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
+@@ -8306,6 +8310,15 @@ public class WindowManagerService extends IWindowManager.Stub
+     }
+ 
+     @Override
++    public boolean isActiveEvenInBackground(String pkgName) {
++        // TODO: XUJAY to add synchronize() around
++        boolean result = mBgActiveApps.contains(pkgName);
++        //Slog.i("XUJAY_API", "WMS::isActiveEvenInBackground()," + pkgName + ", " + result);
++        return result;
++    }
++
++
++    @Override
+     public boolean inputMethodClientHasFocus(IInputMethodClient client) {
+         synchronized (mWindowMap) {
+             // The focus for the client is the window immediately below
+@@ -11866,6 +11879,19 @@ public class WindowManagerService extends IWindowManager.Stub
+         }
+ 
+         @Override
++        public void setAppBackgroundAlive(String appName) {
++            Slog.i("XUJAY_API", "WindowManagerService::setAppBackgroundAlive()...set "
++                   + appName + " into ArraySet " + ", size() " + mBgActiveApps.size()
++                   + ", contains(" + appName + "): " + mBgActiveApps.contains(appName));
++            mBgActiveApps.add(appName);
++        }
++
++        @Override
++        public ArraySet<String> getBackgroundApps() {
++            return mBgActiveApps;
++        }
++
++        @Override
+         public void setMagnificationSpec(MagnificationSpec spec) {
+             synchronized (mWindowMap) {
+                 if (mAccessibilityController != null) {
+diff --git a/services/tests/servicestests/src/com/android/server/MockAccessibilityService.java b/services/tests/servicestests/src/com/android/server/MockAccessibilityService.java
+index 1bc9b86..05efbfd 100644
+--- a/services/tests/servicestests/src/com/android/server/MockAccessibilityService.java
++++ b/services/tests/servicestests/src/com/android/server/MockAccessibilityService.java
+@@ -139,6 +139,12 @@ public abstract class MockAccessibilityService extends AccessibilityService {
+     }
+ 
+     @Override
++    public void onAccessibilityEventForBackground(String appName, AccessibilityEvent receivedEvent) {
++
++
++    }
++
++    @Override
+     public void onInterrupt() {
+         if (!mReplaying) {
+             return;
+diff --git a/tests/AccessibilityEventsLogger/src/com/android/tests/accessibilityeventslogger/AELogger.java b/tests/AccessibilityEventsLogger/src/com/android/tests/accessibilityeventslogger/AELogger.java
+index 27d8eb9..a6ff036 100644
+--- a/tests/AccessibilityEventsLogger/src/com/android/tests/accessibilityeventslogger/AELogger.java
++++ b/tests/AccessibilityEventsLogger/src/com/android/tests/accessibilityeventslogger/AELogger.java
+@@ -62,4 +62,9 @@ public class AELogger extends AccessibilityService {
+             toast.show();
+         }
+     }
++
++    @Override
++    public void onAccessibilityEventForBackground(String appName, AccessibilityEvent event) {
++
++    }
+ }
+diff --git a/tools/layoutlib/bridge/src/android/view/IWindowManagerImpl.java b/tools/layoutlib/bridge/src/android/view/IWindowManagerImpl.java
+index 82012c1..220678e 100644
+--- a/tools/layoutlib/bridge/src/android/view/IWindowManagerImpl.java
++++ b/tools/layoutlib/bridge/src/android/view/IWindowManagerImpl.java
+@@ -80,6 +80,13 @@ public class IWindowManagerImpl implements IWindowManager {
+     }
+ 
+     @Override
++    public boolean isActiveEvenInBackground(String pkgName) {
++
++        return false;
++    }
++    
++
++    @Override
+     public void addWindowToken(IBinder arg0, int arg1) throws RemoteException {
+         // TODO Auto-generated method stub
+ 
+diff --git a/tools/layoutlib/bridge/src/android/view/accessibility/AccessibilityManager.java b/tools/layoutlib/bridge/src/android/view/accessibility/AccessibilityManager.java
+index edb5eff..1666de9 100644
+--- a/tools/layoutlib/bridge/src/android/view/accessibility/AccessibilityManager.java
++++ b/tools/layoutlib/bridge/src/android/view/accessibility/AccessibilityManager.java
+@@ -261,7 +261,7 @@ public final class AccessibilityManager {
+     private void setStateLocked(int stateFlags) {
+     }
+ 
+-    public int addAccessibilityInteractionConnection(IWindow windowToken,
++    public int addAccessibilityInteractionConnection(IWindow windowToken, String appName,
+             IAccessibilityInteractionConnection connection) {
+         return View.NO_ID;
+     }

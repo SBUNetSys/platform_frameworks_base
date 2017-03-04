@@ -3776,6 +3776,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     }
 
     /**
+     * XUJAY: True when be alive even in background
+     */
+    boolean isActiveInBackground = false;
+
+    /**
      * @hide
      */
     String mStartActivityRequestWho;
@@ -6345,7 +6350,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         getBoundsOnScreen(bounds, true);
         info.setBoundsInScreen(bounds);
 
-        Log.i("SyncUI", "...Init AccNodeInfo id is " + mAccessibilityViewId);
+        //Log.i("SyncUI", "...Init AccNodeInfo id is " + mAccessibilityViewId);
         info.setAccessibilityViewId(mAccessibilityViewId);
 
         ViewParent parent = getParentForAccessibility();
@@ -7063,8 +7068,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         do {
             //Log.i("XUJAY....", "isShown() in package: " +  mContext.getPackageName());
             String appName = mContext.getPackageName();
-            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
-                    
+            if (isActiveInBackground) {
+     
             } else {
                 if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
                     return false;
@@ -7449,6 +7454,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     @RemotableViewMethod
     public void setVisibility(@Visibility int visibility) {
+        //Log.i("XUJAY...VISI", "setVisibility: " + visibility);
+        String appName = mContext.getPackageName();
+        if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+            isActiveInBackground = true;
+        } else {
+            isActiveInBackground = false;       
+        }
         setFlags(visibility, VISIBILITY_MASK);
     }
 
@@ -8846,6 +8858,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     public void setTransitionVisibility(@Visibility int visibility) {
         mViewFlags = (mViewFlags & ~View.VISIBILITY_MASK) | visibility;
+        //Log.i("XUJAY....", "setTransitionVisibility: " + visibility);
     }
 
     /**

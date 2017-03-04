@@ -154,7 +154,6 @@ public final class WindowManagerGlobal {
         boolean result = false;
         synchronized (WindowManagerGlobal.class) {
             try {
-                windowManager = getWindowManagerService();
                 result = windowManager.isActiveEvenInBackground(pkgName);
             } catch (RemoteException e) {
                 Log.e(TAG, "Failed to open window session", e);

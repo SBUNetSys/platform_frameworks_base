@@ -7061,7 +7061,6 @@ public final class ViewRootImpl implements ViewParent,
             Log.i("XUJAY_API", "setAppBackgroundAlive");
             ArraySet<String> bgApps = WindowManagerGlobal.getInstance().getBackgroundApps();
             
-            
         }
 
 
