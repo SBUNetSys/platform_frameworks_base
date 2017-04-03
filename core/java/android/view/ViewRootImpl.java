@@ -104,6 +104,7 @@ public final class ViewRootImpl implements ViewParent,
         View.AttachInfo.Callbacks, HardwareRenderer.HardwareDrawCallbacks {
     private static final String TAG = "ViewRootImpl";
     private static final boolean DBG = false;
+    
     private static final boolean LOCAL_LOGV = false;
     /** @noinspection PointlessBooleanExpression*/
     private static final boolean DEBUG_DRAW = false || LOCAL_LOGV;
@@ -828,6 +829,7 @@ public final class ViewRootImpl implements ViewParent,
             }
 
             mWindowAttributesChanged = true;
+            Log.i("XUJAY_INV", "scheduleTraversals() by setLayoutParams()");
             scheduleTraversals();
         }
     }
@@ -835,6 +837,7 @@ public final class ViewRootImpl implements ViewParent,
     void handleAppVisibility(boolean visible) {
         if (mAppVisible != visible) {
             mAppVisible = visible;
+            Log.i("XUJAY_INV", "scheduleTraversals() by handleAppVisibility()");
             scheduleTraversals();
             if (!mAppVisible) {
                 WindowManagerGlobal.trimForeground();
@@ -845,6 +848,7 @@ public final class ViewRootImpl implements ViewParent,
     void handleGetNewSurface() {
         mNewSurfaceNeeded = true;
         mFullRedrawNeeded = true;
+        Log.i("XUJAY_INV", "scheduleTraversals() by handleGetNewSurface()");
         scheduleTraversals();
     }
 
@@ -866,6 +870,7 @@ public final class ViewRootImpl implements ViewParent,
                         if (oldDisplayState == Display.STATE_OFF) {
                             // Draw was suppressed so we need to for it to happen here.
                             mFullRedrawNeeded = true;
+                            Log.i("XUJAY_INV", "scheduleTraversals() by onDisplayChanged()");
                             scheduleTraversals();
                         }
                     }
@@ -904,14 +909,18 @@ public final class ViewRootImpl implements ViewParent,
     public void requestFitSystemWindows() {
         checkThread();
         mApplyInsetsRequested = true;
+        Log.i("XUJAY_INV", "scheduleTraversals() by requestFitSystemWindows()");
         scheduleTraversals();
     }
 
     @Override
     public void requestLayout() {
+        Log.i("XUJAY_INV", "requestLayout(), !mHandlingLayoutInLayoutRequest: "
+              + !mHandlingLayoutInLayoutRequest);
         if (!mHandlingLayoutInLayoutRequest) {
             checkThread();
             mLayoutRequested = true;
+            Log.i("XUJAY_INV", "scheduleTraversals() by requestLayout()");
             scheduleTraversals();
         }
     }
@@ -922,13 +931,17 @@ public final class ViewRootImpl implements ViewParent,
     }
 
     void invalidate() {
+        Log.i("XUJAY_INV", "Invalidating now, width: " + mWidth + ", height: "+ mHeight +
+              ", mWillDrawSoon:" + mWillDrawSoon);
         mDirty.set(0, 0, mWidth, mHeight);
         if (!mWillDrawSoon) {
+            Log.i("XUJAY_INV", "scheduleTraversals() by invalidate()");
             scheduleTraversals();
         }
     }
 
     void invalidateWorld(View view) {
+        Log.i("XUJAY_INV", "invalidateWorld, view: " + view.toString());
         view.invalidate();
         if (view instanceof ViewGroup) {
             ViewGroup parent = (ViewGroup) view;
@@ -949,6 +962,7 @@ public final class ViewRootImpl implements ViewParent,
         if (DEBUG_DRAW) Log.v(TAG, "Invalidate child: " + dirty);
 
         if (dirty == null) {
+            Log.i("XUJAY_INV", "invalidateChildInParent calls invalidate");
             invalidate();
             return null;
         } else if (dirty.isEmpty() && !mIsAnimating) {
@@ -968,7 +982,7 @@ public final class ViewRootImpl implements ViewParent,
                 dirty.inset(-1, -1);
             }
         }
-
+        Log.i("XUJAY_INV", "invalidateChildInParent calls invalidateRectOnScreen()");
         invalidateRectOnScreen(dirty);
 
         return null;
@@ -992,6 +1006,7 @@ public final class ViewRootImpl implements ViewParent,
             localDirty.setEmpty();
         }
         if (!mWillDrawSoon && (intersected || mIsAnimating)) {
+            Log.i("XUJAY_INV", "scheduleTraversals() by invalidateRectOnScreen()");
             scheduleTraversals();
         }
     }
@@ -1012,6 +1027,7 @@ public final class ViewRootImpl implements ViewParent,
         if (mStopped != stopped) {
             mStopped = stopped;
             if (!mStopped) {
+                Log.i("XUJAY_INV", "scheduleTraversals() by setWindowStopped()");
                 scheduleTraversals();
             }
         }
@@ -1091,6 +1107,7 @@ public final class ViewRootImpl implements ViewParent,
     }
 
     void scheduleTraversals() {
+        Log.i("XUJAY_INV", "scheduleTraversals(): !mTraversalScheduled: " + !mTraversalScheduled);
         if (!mTraversalScheduled) {
             mTraversalScheduled = true;
             mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();
@@ -1114,6 +1131,7 @@ public final class ViewRootImpl implements ViewParent,
     }
 
     void doTraversal() {
+        Log.i("XUJAY_INV", "doTraversal");
         if (mTraversalScheduled) {
             mTraversalScheduled = false;
             mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);
@@ -1300,7 +1318,7 @@ public final class ViewRootImpl implements ViewParent,
     private void performTraversals() {
         // cache mView since it is used so much below...
         final View host = mView;
-
+        Log.i("XUJAY_INV", "performTraversals");
         if (DBG) {
             System.out.println("======================================");
             System.out.println("performTraversals");
@@ -1420,6 +1438,7 @@ public final class ViewRootImpl implements ViewParent,
         boolean insetsChanged = false;
 
         boolean layoutRequested = mLayoutRequested && (!mStopped || mReportNextDraw);
+        Log.i("XUJAY_INV", "layoutRequested is " + layoutRequested);
         if (layoutRequested) {
 
             final Resources res = mView.getContext().getResources();
@@ -1858,6 +1877,7 @@ public final class ViewRootImpl implements ViewParent,
                     hardwareRenderer.setup(mWidth, mHeight, mAttachInfo,
                             mWindowAttributes.surfaceInsets);
                     if (!hwInitialized) {
+                        Log.i("XUJAY_INV", "performTraversal calls invalidate");
                         hardwareRenderer.invalidate(mSurface);
                         mFullRedrawNeeded = true;
                     }
@@ -1865,6 +1885,9 @@ public final class ViewRootImpl implements ViewParent,
             }
 
             if (!mStopped || mReportNextDraw) {
+                Log.i("XUJAY_INV", "Now is in the if branch of (!mStopped || mReportNextDraw), mStopped: " + mStopped
+                      + ", mReportNextDraw: " + mReportNextDraw);
+
                 boolean focusChangedDueToTouchMode = ensureTouchModeLocally(
                         (relayoutResult&WindowManagerGlobal.RELAYOUT_RES_IN_TOUCH_MODE) != 0);
                 if (focusChangedDueToTouchMode || mWidth != host.getMeasuredWidth()
@@ -1943,6 +1966,8 @@ public final class ViewRootImpl implements ViewParent,
         }
 
         final boolean didLayout = layoutRequested && (!mStopped || mReportNextDraw);
+        Log.i("XUJAY_INV", "didLayout is: " + didLayout);
+
         boolean triggerGlobalLayoutListener = didLayout
                 || mAttachInfo.mRecomputeGlobalAttributes;
         if (didLayout) {
@@ -2087,6 +2112,7 @@ public final class ViewRootImpl implements ViewParent,
         } else {
             if (viewVisibility == View.VISIBLE) {
                 // Try again
+                Log.i("XUJAY_INV", "scheduleTraversals() by performTraversal()");
                 scheduleTraversals();
             } else if (mPendingTransitions != null && mPendingTransitions.size() > 0) {
                 for (int i = 0; i < mPendingTransitions.size(); ++i) {
@@ -2398,6 +2424,7 @@ public final class ViewRootImpl implements ViewParent,
                         @Override
                         public void doFrame(long frameTimeNanos) {
                             mDirty.set(0, 0, mWidth, mHeight);
+                            Log.i("XUJAY_INV", "scheduleTraversals() by profileRendering()");
                             scheduleTraversals();
                             if (mRenderProfilingEnabled) {
                                 mChoreographer.postFrameCallback(mRenderProfiler);
@@ -2653,6 +2680,7 @@ public final class ViewRootImpl implements ViewParent,
                     }
 
                     mFullRedrawNeeded = true;
+                    Log.i("XUJAY_INV", "scheduleTraversals() by draw()");
                     scheduleTraversals();
                     return;
                 }
@@ -2665,6 +2693,7 @@ public final class ViewRootImpl implements ViewParent,
 
         if (animating) {
             mFullRedrawNeeded = true;
+            Log.i("XUJAY_INV", "scheduleTraversals() by draw()");
             scheduleTraversals();
         }
     }
@@ -3001,6 +3030,7 @@ public final class ViewRootImpl implements ViewParent,
             if (provider != null) {
                 // Invalidate the area of the cleared accessibility focus.
                 focusNode.getBoundsInParent(mTempRect);
+                Log.i("XUJAY_INV", "setAccessibilityFocus calls invalidate");
                 focusHost.invalidate(mTempRect);
                 // Clear accessibility focus in the virtual node.
                 final int virtualNodeId = AccessibilityNodeInfo.getVirtualDescendantId(
@@ -3030,6 +3060,7 @@ public final class ViewRootImpl implements ViewParent,
             Log.v(TAG, "Request child focus: focus now " + focused);
         }
         checkThread();
+        Log.i("XUJAY_INV", "scheduleTraversals() by requestChildFocus()");
         scheduleTraversals();
     }
 
@@ -3039,6 +3070,7 @@ public final class ViewRootImpl implements ViewParent,
             Log.v(TAG, "Clearing child focus");
         }
         checkThread();
+        Log.i("XUJAY_INV", "scheduleTraversals() by clearChildFocus()");
         scheduleTraversals();
     }
 
@@ -3075,6 +3107,7 @@ public final class ViewRootImpl implements ViewParent,
         if (mView == child) {
             mAttachInfo.mRecomputeGlobalAttributes = true;
             if (!mWillDrawSoon) {
+                Log.i("XUJAY_INV", "scheduleTraversals() by recomputeViewAttributes()");
                 scheduleTraversals();
             }
         }
@@ -3274,10 +3307,12 @@ public final class ViewRootImpl implements ViewParent,
         public void handleMessage(Message msg) {
             switch (msg.what) {
             case MSG_INVALIDATE:
+                Log.i("XUJAY_INV", "MSG_INVALIDATE invalidate");
                 ((View) msg.obj).invalidate();
                 break;
             case MSG_INVALIDATE_RECT:
                 final View.AttachInfo.InvalidateInfo info = (View.AttachInfo.InvalidateInfo) msg.obj;
+                Log.i("XUJAY_INV", "MSG_INVALIDATE_RECT invalidate");
                 info.target.invalidate(info.left, info.top, info.right, info.bottom);
                 info.recycle();
                 break;
@@ -5354,6 +5389,7 @@ public final class ViewRootImpl implements ViewParent,
             // most recent data.
             mSeq = args.seq;
             mAttachInfo.mForceReportNewAttributes = true;
+            Log.i("XUJAY_INV", "scheduleTraversals() by handleDispatchSystemUiVisibilityChanged()");
             scheduleTraversals();
         }
         if (mView == null) return;
@@ -5379,6 +5415,7 @@ public final class ViewRootImpl implements ViewParent,
         if (mWindowsAnimating) {
             mWindowsAnimating = false;
             if (!mDirty.isEmpty() || mIsAnimating || mFullRedrawNeeded)  {
+                Log.i("XUJAY_INV", "scheduleTraversals() by handleDispatchWindowAnimationStopped()");
                 scheduleTraversals();
             }
         }
@@ -5683,6 +5720,7 @@ public final class ViewRootImpl implements ViewParent,
                 // Hardware rendering
                 if (mAttachInfo.mHardwareRenderer != null) {
                     if (mAttachInfo.mHardwareRenderer.loadSystemProperties()) {
+                        Log.i("XUJAY_INV", "loadSystemProperties calls invalidate");
                         invalidate();
                     }
                 }
@@ -6159,7 +6197,7 @@ public final class ViewRootImpl implements ViewParent,
                     mViewRects.clear();
                 }
             }
-
+            Log.i("XUJAY_INV", "InvalidateOnAnimationRunnable calls invalidate");
             for (int i = 0; i < viewCount; i++) {
                 mTempViews[i].invalidate();
                 mTempViews[i] = null;
@@ -6490,6 +6528,8 @@ public final class ViewRootImpl implements ViewParent,
         final Rect oldBounds = mTempRect;
         mAccessibilityFocusedVirtualView.getBoundsInScreen(oldBounds);
         mAccessibilityFocusedVirtualView = provider.createAccessibilityNodeInfo(focusedChildId);
+
+        Log.i("XUJAY_INV", "HandleWindowContentChangedEvent: Start calling invalidateRectOnScreen");
         if (mAccessibilityFocusedVirtualView == null) {
             // Error state: The node no longer exists. Clear focus.
             mAccessibilityFocusedHost = null;
@@ -6673,6 +6713,7 @@ public final class ViewRootImpl implements ViewParent,
      */
     public void setReportNextDraw() {
         mReportNextDraw = true;
+        Log.i("XUJAY_INV", "setReportNextDraw calls invalidate");
         invalidate();
     }
 
@@ -7039,6 +7080,7 @@ public final class ViewRootImpl implements ViewParent,
             destroyHardwareResources();
 
             // Schedule redraw, which will rerecord + redraw all text
+            Log.i("XUJAY_INV", "HighContrastTextManager calls invalidate");
             invalidate();
         }
     }

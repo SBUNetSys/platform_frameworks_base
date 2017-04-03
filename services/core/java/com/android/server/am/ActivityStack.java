@@ -768,7 +768,13 @@ final class ActivityStack {
             for (int activityNdx = activities.size() - 1; activityNdx >= 0; --activityNdx) {
                 final ActivityRecord r = activities.get(activityNdx);
                 if (r.state == ActivityState.STOPPING || r.state == ActivityState.STOPPED) {
-                    r.setSleeping(true);
+                    if (!r.toString().contains("spotify")) {
+                        Slog.i("XUJAY_ACT", r + " activity is sleeping now!!");
+                        r.setSleeping(true);
+                    } else {
+                        r.state = ActivityState.RESUMED;
+                        Slog.i("XUJAY_ACT", r + " activity is not sleeping now....");
+                    }
                 }
             }
         }
@@ -973,7 +979,10 @@ final class ActivityStack {
             r.launchCount = 0;
             r.updateThumbnailLocked(null, description);
         }
-        if (!r.stopped) {
+        boolean spotify = r.toString().contains("spotify");
+        if (spotify)
+            Slog.i("XUJAY_ACT", r + " not stopping anymore!!");
+        if (!r.stopped && !spotify) {
             if (DEBUG_STATES) Slog.v(TAG_STATES, "Moving to STOPPED: " + r + " (stop complete)");
             mHandler.removeMessages(STOP_TIMEOUT_MSG, r);
             r.stopped = true;
@@ -1402,7 +1411,10 @@ final class ActivityStack {
                             switch (r.state) {
                                 case STOPPING:
                                 case STOPPED:
-                                    if (r.app != null && r.app.thread != null) {
+                                    boolean spotify = r.toString().contains("spotify");
+                                    if (spotify) {
+
+                                    } else if (r.app != null && r.app.thread != null) {
                                         if (DEBUG_VISIBILITY) Slog.v(TAG_VISIBILITY,
                                                 "Scheduling invisibility: " + r);
                                         r.app.thread.scheduleWindowVisibility(r.appToken, false);
@@ -2663,6 +2675,11 @@ final class ActivityStack {
     }
 
     final void stopActivityLocked(ActivityRecord r) {
+        if (!r.toString().contains("spotify")) {
+            Slog.i("XUJAY_ACT", r + " activity skipping stopActivityLocked now!!");
+            return;
+        }
+
         if (DEBUG_SWITCH) Slog.d(TAG_SWITCH, "Stopping: " + r);
         if ((r.intent.getFlags()&Intent.FLAG_ACTIVITY_NO_HISTORY) != 0
                 || (r.info.flags&ActivityInfo.FLAG_NO_HISTORY) != 0) {
@@ -2711,6 +2728,7 @@ final class ActivityStack {
                 r.stopped = true;
                 if (DEBUG_STATES) Slog.v(TAG_STATES, "Stop failed; moving to STOPPED: " + r);
                 r.state = ActivityState.STOPPED;
+                
                 if (r.configDestroy) {
                     destroyActivityLocked(r, true, "stop-except");
                 }

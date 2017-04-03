@@ -22,17 +22,21 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.MessageQueue;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
 import dalvik.system.CloseGuard;
 
+import com.android.internal.os.BinderInternal;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.hardware.ISensorProxy;
 /**
  * Sensor manager implementation that communicates with the built-in
  * system sensors.
@@ -101,6 +105,7 @@ public class SystemSensorManager extends SensorManager {
     @Override
     protected boolean registerListenerImpl(SensorEventListener listener, Sensor sensor,
             int delayUs, Handler handler, int maxBatchReportLatencyUs, int reservedFlags) {
+        Log.i("XUJAY_SENSOR", "dummy.............." + sensor);
         if (listener == null || sensor == null) {
             Log.e(TAG, "sensor or listener is null");
             return false;
@@ -450,12 +455,47 @@ public class SystemSensorManager extends SensorManager {
             }
         }
 
+
+        private float[] modifySensors(float[] values) {
+            Log.i("XUJAY_SENSOR", "calling modifySensors...");
+            values[0] = 1;
+            values[1] = 2;
+            values[2] = 3;
+            float list[] = new float[3];
+            IBinder ibinder = null;  // TODO: resolve this!!!
+            ISensorProxy sp = ISensorProxy.Stub.asInterface(ibinder);
+            
+            try {
+                list = sp.modifySensors(values);
+            } catch (RemoteException re) {
+                Log.e("XUJAY_SENSOR", "Calling modifySensors() error!");
+            }
+            return list;
+        }
+
+        
         // Called from native code.
         @SuppressWarnings("unused")
         @Override
         protected void dispatchSensorEvent(int handle, float[] values, int inAccuracy,
                 long timestamp) {
             final Sensor sensor = mManager.mHandleToSensor.get(handle);
+            Log.i("XUJAY_SENSOR", "dispatchSensorEvent: " + sensor);
+            // int len = values.length;
+            // for (int i = 0; i < 3; ++i) {
+            //     Log.i("XUJAY_SENSOR", "values[" + i + "]: " + values[i]);
+            // }
+
+            int type = sensor.getType();
+            if (type == Sensor.TYPE_ACCELEROMETER || type == Sensor.TYPE_GYROSCOPE) {
+                // if is accelerometer or gyroscope, do proxying
+                // TODO: proxying the sensor data from the watch                
+                Log.i("XUJAY_SENSOR", "You  got the right sensors!!!");
+                //float v[] = modifySensors(values);
+                //System.arraycopy(v, 0, values, 0, v.length);
+                
+            }
+
             SensorEvent t = null;
             synchronized (mSensorsEvents) {
                 t = mSensorsEvents.get(handle);
@@ -523,6 +563,9 @@ public class SystemSensorManager extends SensorManager {
         protected void dispatchSensorEvent(int handle, float[] values, int accuracy,
                 long timestamp) {
             final Sensor sensor = mManager.mHandleToSensor.get(handle);
+
+            Log.i("XUJAY_SENSOR", "TriggerEventQueue::dispatchSensorEvent, sensor: " + sensor);
+
             TriggerEvent t = null;
             synchronized (mTriggerEvents) {
                 t = mTriggerEvents.get(handle);

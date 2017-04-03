@@ -5003,6 +5003,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (indicators != 0) {
                 initializeScrollIndicatorsInternal();
             }
+            Log.i("XUJAY_INV", "setScrollIndicators calls invalidate");
             invalidate();
         }
     }
@@ -5213,8 +5214,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final ListenerInfo li = mListenerInfo;
         if (li != null && li.mOnClickListener != null) {
             playSoundEffect(SoundEffectConstants.CLICK);
-            Log.i("XUJAY_API", this.toString());
             li.mOnClickListener.onClick(this);
+            setFlags(PFLAG_DIRTY, PFLAG_DIRTY_MASK);  // set flags to force refresh
+            Log.i("XUJAY_API", this.toString());
+            requestLayout();
+            invalidate();
             result = true;
         } else {
             result = false;
@@ -5729,7 +5733,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 && mAttachInfo.mHasWindowFocus) {
             imm.focusIn(this);
         }
-
+        Log.i("XUJAY_INV", "onFocusChanged calls invalidate");
         invalidate(true);
         ListenerInfo li = mListenerInfo;
         if (li != null && li.mOnFocusChangeListener != null) {
@@ -7495,6 +7499,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
         // Invalidate too, since the default behavior for views is to be
         // be drawn at 50% alpha rather than to change the drawable.
+        Log.i("XUJAY_INV", this.toString() + ", setEnabled calls invalidate");
         invalidate(true);
 
         if (!enabled) {
@@ -7652,6 +7657,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             // We need to resolve all RTL properties as they all depend on layout direction
             resolveRtlPropertiesIfNeeded();
             requestLayout();
+            Log.i("XUJAY_INV", "setLayoutDirection calls invalidate");
             invalidate(true);
         }
     }
@@ -8347,6 +8353,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (viewRootImpl != null) {
                 viewRootImpl.setAccessibilityFocus(this, null);
             }
+            Log.i("XUJAY_INV", "requestAccessibilityFocus calls invalidate");
             invalidate();
             sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
             return true;
@@ -8409,6 +8416,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     void clearAccessibilityFocusNoCallbacks() {
         if ((mPrivateFlags2 & PFLAG2_ACCESSIBILITY_FOCUSED) != 0) {
             mPrivateFlags2 &= ~PFLAG2_ACCESSIBILITY_FOCUSED;
+            Log.i("XUJAY_INV", "clearAccessibilityFocusNoCallbacks calls invalidate");
             invalidate();
             sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
         }
@@ -8932,6 +8940,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     * @hide
     */
     public boolean performAccessibilityActionInternal(int action, Bundle arguments) {
+        Log.i("XUJAY_INV", "performAccessibilityActionInternal");
         if (isNestedScrollingEnabled()
                 && (action == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD
                 || action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD
@@ -8943,11 +8952,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 return true;
             }
         }
-
+        Log.i("XUJAY_INV", "Before clicking the status is " + this.toString() + ", perform action is: " + action);
         switch (action) {
             case AccessibilityNodeInfo.ACTION_CLICK: {
+                Log.i("XUJAY_INV", "isClickable: " + isClickable());
                 if (isClickable()) {
                     performClick();
+                    Log.i("XUJAY_INV", "After clicking the status is " + this.toString());
                     return true;
                 }
             } break;
@@ -10624,6 +10635,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                  * go through.
                  */
                 mPrivateFlags |= PFLAG_DRAWN;
+                Log.i("XUJAY_INV", this.toString() + ", setFlags calls invalidate");
                 invalidate(true);
 
                 needGlobalAttributesUpdate(true);
@@ -10649,6 +10661,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 destroyDrawingCache();
                 if (mParent instanceof View) {
                     // GONE views noop invalidation, so invalidate the parent
+                    Log.i("XUJAY_INV", this.toString() + ", setFlags calls invalidate");
                     ((View) mParent).invalidate(true);
                 }
                 // Mark the view drawn to ensure that it gets invalidated properly the next
@@ -10690,6 +10703,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (mParent instanceof ViewGroup) {
                 ((ViewGroup) mParent).onChildVisibilityChanged(this,
                         (changed & VISIBILITY_MASK), newVisibility);
+                Log.i("XUJAY_INV", this.toString() + ", setFlags calls invalidate");
                 ((View) mParent).invalidate(true);
             } else if (mParent != null) {
                 mParent.invalidateChild(this, null);
@@ -10728,6 +10742,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 mPrivateFlags &= ~PFLAG_SKIP_DRAW;
             }
             requestLayout();
+            Log.i("XUJAY_INV", this.toString() + ", setFlags calls invalidate");
             invalidate(true);
         }
 
@@ -11508,6 +11523,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 mPrivateFlags |= PFLAG_ALPHA_SET;
                 // subclass is handling alpha - don't optimize rendering cache invalidation
                 invalidateParentCaches();
+                Log.i("XUJAY_INV", "setAlpha calls invalidate");
                 invalidate(true);
             } else {
                 mPrivateFlags &= ~PFLAG_ALPHA_SET;
@@ -11607,6 +11623,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @param top The top of this view, in pixels.
      */
     public final void setTop(int top) {
+        Log.i("XUJAY_INV", "setTop calls invalidate");
         if (top != mTop) {
             final boolean matrixIsIdentity = hasIdentityMatrix();
             if (matrixIsIdentity) {
@@ -11678,6 +11695,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @param bottom The bottom of this view, in pixels.
      */
     public final void setBottom(int bottom) {
+        Log.i("XUJAY_INV", this.toString() + ", setBottom calls invalidate");
         if (bottom != mBottom) {
             final boolean matrixIsIdentity = hasIdentityMatrix();
             if (matrixIsIdentity) {
@@ -11737,6 +11755,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @param left The left of this view, in pixels.
      */
     public final void setLeft(int left) {
+        Log.i("XUJAY_INV", "setLeft calls invalidate");
         if (left != mLeft) {
             final boolean matrixIsIdentity = hasIdentityMatrix();
             if (matrixIsIdentity) {
@@ -11799,6 +11818,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @param right The right of this view, in pixels.
      */
     public final void setRight(int right) {
+        Log.i("XUJAY_INV", "setRight calls invalidate");
+                    
         if (right != mRight) {
             final boolean matrixIsIdentity = hasIdentityMatrix();
             if (matrixIsIdentity) {
@@ -12684,6 +12705,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     public void invalidate(Rect dirty) {
         final int scrollX = mScrollX;
         final int scrollY = mScrollY;
+        Log.i("XUJAY_INV", "calling this invalidate(Rect)");
         invalidateInternal(dirty.left - scrollX, dirty.top - scrollY,
                 dirty.right - scrollX, dirty.bottom - scrollY, true, false);
     }
@@ -12705,6 +12727,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     public void invalidate(int l, int t, int r, int b) {
         final int scrollX = mScrollX;
         final int scrollY = mScrollY;
+        Log.i("XUJAY_INV", "calling this invalidate(int,int,int,int)");
         invalidateInternal(l - scrollX, t - scrollY, r - scrollX, b - scrollY, true, false);
     }
 
@@ -12717,6 +12740,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * {@link #postInvalidate()}.
      */
     public void invalidate() {
+        Log.i("XUJAY_INV", "calling this invalidate(true)");
+        //Log.i("XUJAY_INV", Thread.currentThread().getStackTrace()[2].getMethodName());
+        
+        //Log.i("XUJAY_INV", "caller name[2] of invalidate: " + stackTraceElements[2].getMethodName());
         invalidate(true);
     }
 
@@ -12733,17 +12760,23 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      *            dimensions have not changed.
      */
     void invalidate(boolean invalidateCache) {
+        Log.i("XUJAY_INV", "calling this invalidate(boolean): " + invalidateCache);
+
+        
         invalidateInternal(0, 0, mRight - mLeft, mBottom - mTop, invalidateCache, true);
     }
 
     void invalidateInternal(int l, int t, int r, int b, boolean invalidateCache,
             boolean fullInvalidate) {
+        //Log.i("XUJAY_INV", "invalidateInternal()");
         if (mGhostView != null) {
             mGhostView.invalidate(true);
             return;
         }
-
-        if (skipInvalidate()) {
+        
+        boolean skip = skipInvalidate();
+        Log.i("XUJAY_INV", "view status:" + this.toString() + "invalidate skipInvalidate: " + skip);
+        if (skip) {
             return;
         }
 
@@ -12769,6 +12802,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (p != null && ai != null && l < r && t < b) {
                 final Rect damage = ai.mTmpInvalRect;
                 damage.set(l, t, r, b);
+                Log.i("XUJAY_INV", "invalidateInternal calls invalidateChild()");
                 p.invalidateChild(this, damage);
             }
 
@@ -12853,6 +12887,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (forceRedraw) {
                 mPrivateFlags |= PFLAG_DRAWN; // force another invalidation with the new orientation
             }
+            Log.i("XUJAY_INV", "invalidateViewProperty calls invalidate");
+
             invalidate(false);
         } else {
             damageInParent();
@@ -12922,6 +12958,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     protected void invalidateParentIfNeeded() {
         if (isHardwareAccelerated() && mParent instanceof View) {
+            Log.i("XUJAY_INV", "invalidateParentIfNeeded calls invalidate");
+
             ((View) mParent).invalidate(true);
         }
     }
@@ -13970,6 +14008,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     bottom = top + size;
                     onDrawHorizontalScrollBar(canvas, scrollBar, left, top, right, bottom);
                     if (invalidate) {
+                        Log.i("XUJAY_INV", "onDrawScrollBars calls invalidate");
                         invalidate(left, top, right, bottom);
                     }
                 }
@@ -14002,6 +14041,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     bottom = scrollY + height - (mUserPaddingBottom & inside);
                     onDrawVerticalScrollBar(canvas, scrollBar, left, top, right, bottom);
                     if (invalidate) {
+                        Log.i("XUJAY_INV", "onDrawScrollBars calls invalidate");
                         invalidate(left, top, right, bottom);
                     }
                 }
@@ -14948,6 +14988,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         // draw() behaves differently if we are on a layer, so we need to
         // invalidate() here
         invalidateParentCaches();
+        Log.i("XUJAY_INV", "setLayerType calls invalidate");
         invalidate(true);
     }
 
@@ -14985,6 +15026,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     invalidateViewProperty(false, false);
                 }
             } else {
+                Log.i("XUJAY_INV", "setLayerPaint calls invalidate");
                 invalidate();
             }
         }
@@ -15840,6 +15882,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         }
 
         if (more) {
+            Log.i("XUJAY_INV", "applyLegacyAnimation calls invalidate");
             if (!a.willChangeBounds()) {
                 if ((flags & (ViewGroup.FLAG_OPTIMIZE_INVALIDATE | ViewGroup.FLAG_ANIMATION_DONE)) ==
                         ViewGroup.FLAG_OPTIMIZE_INVALIDATE) {
@@ -16185,6 +16228,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         if (more && hardwareAcceleratedCanvas) {
             if (a.hasAlpha() && (mPrivateFlags & PFLAG_ALPHA_SET) == PFLAG_ALPHA_SET) {
                 // alpha animations should cause the child to recreate its display list
+                Log.i("XUJAY_INV", "draw calls invalidate");
                 invalidate(true);
             }
         }
@@ -16755,6 +16799,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             boolean sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
 
             // Invalidate our old position
+            Log.i("XUJAY_INV", this.toString() + ", setFrame calls invalidate");
             invalidate(sizeChanged);
 
             mLeft = left;
@@ -16845,6 +16890,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             final int scrollX = mScrollX;
             final int scrollY = mScrollY;
 
+            Log.i("XUJAY_INV", this.toString() + ", invalidateDrawable calls invalidate");
             invalidate(dirty.left + scrollX, dirty.top + scrollY,
                     dirty.right + scrollX, dirty.bottom + scrollY);
             rebuildOutline();
@@ -17381,6 +17427,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         }
 
         mBackgroundSizeChanged = true;
+        Log.i("XUJAY_INV", this.toString() + ", setBackgroundDrawable calls invalidate");
         invalidate(true);
     }
 
@@ -17545,6 +17592,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             mPrivateFlags |= PFLAG_SKIP_DRAW;
         }
         requestLayout();
+        Log.i("XUJAY_INV", "setForeground calls invalidate");
         invalidate();
     }
 
@@ -18023,6 +18071,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         if (((mPrivateFlags & PFLAG_SELECTED) != 0) != selected) {
             mPrivateFlags = (mPrivateFlags & ~PFLAG_SELECTED) | (selected ? PFLAG_SELECTED : 0);
             if (!selected) resetPressedState();
+            Log.i("XUJAY_INV", "setSelected calls invalidate");
             invalidate(true);
             refreshDrawableState();
             dispatchSetSelected(selected);
@@ -18072,6 +18121,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         //noinspection DoubleNegation
         if (((mPrivateFlags & PFLAG_ACTIVATED) != 0) != activated) {
             mPrivateFlags = (mPrivateFlags & ~PFLAG_ACTIVATED) | (activated ? PFLAG_ACTIVATED : 0);
+            Log.i("XUJAY_INV", "setActivated calls invalidate");            
             invalidate(true);
             refreshDrawableState();
             dispatchSetActivated(activated);
@@ -19163,6 +19213,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         animation.setStartTime(Animation.START_ON_FIRST_FRAME);
         setAnimation(animation);
         invalidateParentCaches();
+        Log.i("XUJAY_INV", "startAnimation calls invalidate");
         invalidate(true);
     }
 
@@ -20367,6 +20418,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             onRtlPropertiesChanged(getLayoutDirection());
             // Refresh
             requestLayout();
+            Log.i("XUJAY_INV", "setTextDirection calls invalidate");
             invalidate(true);
         }
     }
@@ -20604,6 +20656,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             onRtlPropertiesChanged(getLayoutDirection());
             // Refresh
             requestLayout();
+            Log.i("XUJAY_INV", "setTextAlignment calls invalidate");
             invalidate(true);
         }
     }
@@ -22054,6 +22107,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 state = FADING;
 
                 // Kick off the fade animation
+                Log.i("XUJAY_INV", "run() calls invalidate");
                 host.invalidate(true);
             }
         }

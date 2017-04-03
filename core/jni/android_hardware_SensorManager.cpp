@@ -266,6 +266,7 @@ private:
                         break;
                     }
                     if (receiverObj.get()) {
+                        ALOGI("XUJAY_SENSOR: dispatching sensor events");
                         env->CallVoidMethod(receiverObj.get(),
                                             gBaseEventQueueClassInfo.dispatchSensorEvent,
                                             buffer[i].sensor,

@@ -1491,6 +1491,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
         if (drawable != null) {
             drawable.setAlpha(alpha);
+            Log.i("XUJAY_INV", "onDrawableChanged......");
             view.setImageDrawable(drawable);
             view.setVisibility(View.VISIBLE);
         } else {
