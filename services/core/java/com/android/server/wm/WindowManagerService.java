@@ -8304,9 +8304,12 @@ public class WindowManagerService extends IWindowManager.Stub
 
      @Override
     public boolean isActiveEvenInBackground(String pkgName) {
-        // TODO: XUJAY to add synchronize() around
-        boolean result = mBgActiveApps.contains(pkgName);
         //Slog.i("XUJAY_API", "WMS::isActiveEvenInBackground()," + pkgName + ", " + result);
+        boolean result = false;
+        synchronized(mBgActiveApps) {
+            result = mBgActiveApps.contains(pkgName);
+            //Slog.i("XUJAY_API", "WMS::isActiveEvenInBackground()," + pkgName + ", " + result);
+        }
         return result;
     }
 

@@ -3777,6 +3777,12 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         return getContext().getPackageName();
     }
 
+     /**
+      * XUJAY: True when be alive even in background
+      */
+    boolean isActiveInBackground = false;
+
+
     /**
      * @hide
      */
@@ -7066,7 +7072,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         //noinspection ConstantConditions
         do {
             String appName = mContext.getPackageName();
-            if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+            if (isActiveInBackground) {
 
             } else if ((current.mViewFlags & VISIBILITY_MASK) != VISIBLE) {
                 return false;
@@ -7450,6 +7456,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     @RemotableViewMethod
     public void setVisibility(@Visibility int visibility) {
+        //Log.i("XUJAY...VISI", "setVisibility: " + visibility);
+        String appName = mContext.getPackageName();
+        if (WindowManagerGlobal.isActiveEvenInBackground(appName)) {
+            isActiveInBackground = true;
+        } else {
+            isActiveInBackground = false;
+        }
         setFlags(visibility, VISIBILITY_MASK);
     }
 
