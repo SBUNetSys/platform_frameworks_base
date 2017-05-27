@@ -35,8 +35,6 @@ import android.view.KeyEvent;
 
     void onInterrupt();
 
-    void onAccessibilityEventForBackground(String pkgName, in AccessibilityEvent event);
-
     void onGesture(int gesture);
 
     void clearAccessibilityCache();

@@ -368,7 +368,6 @@ public abstract class AccessibilityService extends Service {
      */
     public interface Callbacks {
         public void onAccessibilityEvent(AccessibilityEvent event);
-        public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event);
         public void onInterrupt();
         public void onServiceConnected();
         public void init(int connectionId, IBinder windowToken);
@@ -390,14 +389,6 @@ public abstract class AccessibilityService extends Service {
      * @param event An event.
      */
     public abstract void onAccessibilityEvent(AccessibilityEvent event);
-
-
-     /**
-      * This API captures event of the 'pkgName' application even in background
-      *
-      * @param event An event.
-      */
-    public abstract void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event);
 
 
     /**
@@ -690,11 +681,6 @@ public abstract class AccessibilityService extends Service {
             }
 
             @Override
-            public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
-                AccessibilityService.this.onAccessibilityEventForBackground(pkgName, event);
-            }
-
-            @Override
             public void init(int connectionId, IBinder windowToken) {
                 mConnectionId = connectionId;
                 mWindowToken = windowToken;
@@ -732,7 +718,6 @@ public abstract class AccessibilityService extends Service {
         private static final int DO_ON_GESTURE = 4;
         private static final int DO_CLEAR_ACCESSIBILITY_CACHE = 5;
         private static final int DO_ON_KEY_EVENT = 6;
-        private static final int DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND = 7;
 
         private final HandlerCaller mCaller;
 
@@ -760,12 +745,6 @@ public abstract class AccessibilityService extends Service {
 
         public void onAccessibilityEvent(AccessibilityEvent event) {
             Message message = mCaller.obtainMessageO(DO_ON_ACCESSIBILITY_EVENT, event);
-            mCaller.sendMessage(message);
-        }
-
-        public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
-            Log.i("XUJAY....", "IAccessibilityServiceClientWrapper::onAccessibilityEventForBackground..");
-            Message message = mCaller.obtainMessageOO(DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND, pkgName, event);
             mCaller.sendMessage(message);
         }
 
@@ -801,26 +780,6 @@ public abstract class AccessibilityService extends Service {
                         }
                     }
                 } return;
-
-                case DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND: {
-                    SomeArgs args = (SomeArgs) message.obj;
-                    String pkgName = (String) args.arg1;
-                    AccessibilityEvent event = (AccessibilityEvent) args.arg2;
-                    Log.i("XUJAY...", "DO_ON_ACCESSIBILITY_EVENT_FOR_BACKGROUND: pkgName " + pkgName + ", event " + event);
-
-                    // XUJAY: TODO, replace null with parameter package name
-                    if (event != null) {
-                        AccessibilityInteractionClient.getInstance().onAccessibilityEventForBackground(pkgName, event);
-                        mCallback.onAccessibilityEventForBackground(pkgName, event);
-                        // Make sure the event is recycled.
-                        try {
-                            event.recycle();
-                        } catch (IllegalStateException ise) {
-                            /* ignore - best effort */
-                        }
-                    }
-                } return;
-
 
                 case DO_ON_INTERRUPT: {
                     mCallback.onInterrupt();

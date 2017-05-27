@@ -2683,6 +2683,7 @@ package android.accessibilityservice {
     method protected boolean onKeyEvent(android.view.KeyEvent);
     method protected void onServiceConnected();
     method public final boolean performGlobalAction(int);
+    method public boolean setAppBackgroundAlive(java.lang.String);
     method public final void setServiceInfo(android.accessibilityservice.AccessibilityServiceInfo);
     field public static final int GESTURE_SWIPE_DOWN = 2; // 0x2
     field public static final int GESTURE_SWIPE_DOWN_AND_LEFT = 15; // 0xf
@@ -38310,6 +38311,7 @@ package android.view {
     method public android.view.ViewOutlineProvider getOutlineProvider();
     method public int getOverScrollMode();
     method public android.view.ViewOverlay getOverlay();
+    method public java.lang.String getPackageName();
     method public int getPaddingBottom();
     method public int getPaddingEnd();
     method public int getPaddingLeft();
@@ -40149,6 +40151,7 @@ package android.view.accessibility {
     method public int getChildCount();
     method public int getId();
     method public int getLayer();
+    method public java.lang.String getPackageName();
     method public android.view.accessibility.AccessibilityWindowInfo getParent();
     method public android.view.accessibility.AccessibilityNodeInfo getRoot();
     method public int getType();
@@ -40158,6 +40161,7 @@ package android.view.accessibility {
     method public static android.view.accessibility.AccessibilityWindowInfo obtain();
     method public static android.view.accessibility.AccessibilityWindowInfo obtain(android.view.accessibility.AccessibilityWindowInfo);
     method public void recycle();
+    method public void setPackageName(java.lang.String);
     method public void writeToParcel(android.os.Parcel, int);
     field public static final android.os.Parcelable.Creator<android.view.accessibility.AccessibilityWindowInfo> CREATOR;
     field public static final int TYPE_ACCESSIBILITY_OVERLAY = 4; // 0x4

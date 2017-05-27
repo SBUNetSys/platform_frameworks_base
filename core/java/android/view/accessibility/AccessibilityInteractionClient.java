@@ -547,13 +547,6 @@ public final class AccessibilityInteractionClient
 
 
     /**
-     * Jian: for UIWear background
-     */
-    public void onAccessibilityEventForBackground(String pkgName, AccessibilityEvent event) {
-        sAccessibilityCache.onAccessibilityEvent(event);
-    }
-
-    /**
      * Jian:
      * request for the snapshot of current node
      *
