@@ -69,6 +69,12 @@ public class IWindowManagerImpl implements IWindowManager {
         return mHasNavigationBar;
     }
 
+    @Override
+    public boolean isActiveEvenInBackground(String pkgName) {
+
+        return false;
+    }
+
     // ---- unused implementation of IWindowManager ----
 
     @Override
