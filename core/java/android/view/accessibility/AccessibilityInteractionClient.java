@@ -558,7 +558,7 @@ public final class AccessibilityInteractionClient
             if (connection != null) {
                 final int interactionId = mInteractionIdCounter.getAndIncrement();
                 long tid = Thread.currentThread().getId();
-                Log.i("SyncUI", "RequestSnapshot, AccessibilityInteractionClient........");
+                Log.v("SyncUI", "RequestSnapshot, AccessibilityInteractionClient........");
                 return connection.requestSnapshot(accessibilityWindowId, accessibilityNodeId,
                                                   bundle, interactionId, this, tid);
 
