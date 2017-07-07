@@ -1314,7 +1314,7 @@ public class AccessibilityNodeInfo implements Parcelable {
         if (!canPerformRequestOverConnection(mSourceNodeId)) {
             return null;
         }
-        Log.i("SyncUI", "RequestSnapshot, AccessibilityNodeInfo......." + mAccessibilityViewId);
+        Log.v("SyncUI", "RequestSnapshot, AccessibilityNodeInfo......." + mAccessibilityViewId);
         AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
         return client.requestSnapshot(mConnectionId, mWindowId, mAccessibilityViewId, bundle);
     }
