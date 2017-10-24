@@ -7077,9 +7077,7 @@ public final class ViewRootImpl implements ViewParent,
                                     int interrogatingPid, long interrogatingTid) {
             ViewRootImpl viewRootImpl = mViewRootImpl.get();
 
-            Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....BEGIN");
             if (viewRootImpl != null && viewRootImpl.mView != null) {
-                Log.w("SyncUI", "ViewRootImpl.requestSnapshot.....START");
                 // viewRootImpl.getAccessibilityInteractionController()
                 //         .requestSnapshotClientThread(accessibilityNodeId,
                 //                                      bundle, interactionId, callback, flags,

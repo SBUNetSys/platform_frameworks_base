@@ -647,8 +647,6 @@ final class AccessibilityInteractionController {
         
         message.obj = args;
 
-        Log.i("SyncUI", "AccInteractionController.requestSnapshotClientThread.....");
-
         // If the interrogation is performed by the same thread as the main UI
         // thread in this process, set the message as a static reference so
         // after this call completes the same thread but in the interrogating
@@ -657,7 +655,6 @@ final class AccessibilityInteractionController {
             AccessibilityInteractionClient.getInstanceForThread(
                 interrogatingTid).setSameThreadMessage(message);
         } else {
-            Log.i("SyncUI", "AccInteractionController......sendMessage.....");
             mHandler.sendMessage(message);
         }
     }
@@ -692,7 +689,6 @@ final class AccessibilityInteractionController {
                     succeeded = false;  // has not support provider yet
 
                 } else {
-                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
                     Bitmap bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
                     String bitmapKey = "bitmap";
                     bundle.putParcelable(bitmapKey, bitmap);
@@ -715,8 +711,6 @@ final class AccessibilityInteractionController {
                               IAccessibilityInteractionConnectionCallback callback, int flags,
                               int interogatingPid, long interrogatingTid) {
 
-        Log.i("SyncUI", "AccInteractionController......getSnapshot.....");
-
         final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(accessibilityNodeId);
         Bitmap bitmap = null;
         try {
@@ -738,7 +732,6 @@ final class AccessibilityInteractionController {
                     Log.i("SyncUI", "No provider yet");
                     return null;
                 } else {
-                    Log.i("SyncUI", "AccInteractionController.createSnapshot.....");
                     bitmap = target.createSnapshot(Bitmap.Config.ARGB_8888, 0, false);
                     String bitmapKey = "bitmap";
                     bundle.putParcelable(bitmapKey, bitmap);
