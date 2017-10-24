@@ -714,6 +714,7 @@ final class ActivityStack {
         }
     }
 
+    // XUJAY:
     void awakeFromSleepingLocked() {
         // Ensure activities are no longer sleeping.
         for (int taskNdx = mTaskHistory.size() - 1; taskNdx >= 0; --taskNdx) {
@@ -799,6 +800,7 @@ final class ActivityStack {
         return null;
     }
 
+    // XUJAY:
     /**
      * Start pausing the currently resumed activity.  It is an error to call this if there
      * is already an activity being paused or there is no resumed activity.
@@ -837,6 +839,12 @@ final class ActivityStack {
         if (mActivityContainer.mParentActivity == null) {
             // Top level stack, not a child. Look for child stacks.
             mStackSupervisor.pauseChildStacks(prev, userLeaving, uiSleeping, resuming, dontWait);
+        }
+
+        // XUJAY:
+        if (prev.toString().contains("spotify")) {
+            Slog.i(TAG_PAUSE, "spotify stopps pausing, keep it unstopped");
+            return false;
         }
 
         if (DEBUG_STATES) Slog.v(TAG_STATES, "Moving to PAUSING: " + prev);
@@ -891,7 +899,12 @@ final class ActivityStack {
             // the screen is being turned off and the UI is sleeping, don't interrupt
             // key dispatch; the same activity will pick it up again on wakeup.
             if (!uiSleeping) {
-                prev.pauseKeyDispatchingLocked();
+                // XUJAY: if the activity is spotify, then we just skip this pausing
+		// This is the most important part, which sets the UI state to "NON-STOP" in UIWear
+                if (prev.toString().contains("spotify")) {
+                    Slog.i(TAG, "Now we are stopping spotify from pausing dispatching event...");
+                } else 
+                    prev.pauseKeyDispatchingLocked();   // XUJAY: this part is extremely crucial!!
             } else if (DEBUG_PAUSE) {
                  Slog.v(TAG_PAUSE, "Key dispatch not paused for screen off");
             }
@@ -925,6 +938,7 @@ final class ActivityStack {
         }
     }
 
+    // XUJAY
     final void activityPausedLocked(IBinder token, boolean timeout) {
         if (DEBUG_PAUSE) Slog.v(TAG_PAUSE,
             "Activity paused: token=" + token + ", timeout=" + timeout);
@@ -950,6 +964,7 @@ final class ActivityStack {
         }
     }
 
+    // XUJAY
     final void activityStoppedLocked(ActivityRecord r, Bundle icicle,
             PersistableBundle persistentState, CharSequence description) {
         if (r.state != ActivityState.STOPPING) {
@@ -993,7 +1008,7 @@ final class ActivityStack {
 
     private void completePauseLocked(boolean resumeNext) {
         ActivityRecord prev = mPausingActivity;
-        if (DEBUG_PAUSE) Slog.v(TAG_PAUSE, "Complete pause: " + prev);
+        if (DEBUG_PAUSE) Slog.v(TAG_PAUSE, "Complete pause: " + prev);  // Jian: step into here..
 
         if (prev != null) {
             prev.state = ActivityState.PAUSED;
@@ -1132,6 +1147,7 @@ final class ActivityStack {
         }
     }
 
+    // XUJAY
     private void setVisible(ActivityRecord r, boolean visible) {
         r.visible = visible;
         mWindowManager.setAppVisibility(r.appToken, visible);
@@ -1188,6 +1204,7 @@ final class ActivityStack {
         return null;
     }
 
+    // XUJAY
     private ActivityStack getNextVisibleStackLocked() {
         ArrayList<ActivityStack> stacks = mStacks;
         final ActivityRecord parent = mActivityContainer.mParentActivity;
@@ -1253,6 +1270,8 @@ final class ActivityStack {
         return true;
     }
 
+
+    // XUJAY
     /**
      * Make sure that all activities that need to be visible (that is, they
      * currently can be seen by the user) actually are.
@@ -2659,6 +2678,8 @@ final class ActivityStack {
         return true;
     }
 
+
+    // XUJAY
     final void stopActivityLocked(ActivityRecord r) {
         if (DEBUG_SWITCH) Slog.d(TAG_SWITCH, "Stopping: " + r);
         if ((r.intent.getFlags()&Intent.FLAG_ACTIVITY_NO_HISTORY) != 0
@@ -2684,21 +2705,27 @@ final class ActivityStack {
             adjustFocusedActivityLocked(r, "stopActivity");
             r.resumeKeyDispatchingLocked();
             try {
-                r.stopped = false;
-                if (DEBUG_STATES) Slog.v(TAG_STATES,
-                        "Moving to STOPPING: " + r + " (stop requested)");
-                r.state = ActivityState.STOPPING;
-                if (DEBUG_VISIBILITY) Slog.v(TAG_VISIBILITY,
-                        "Stopping visible=" + r.visible + " for " + r);
-                if (!r.visible) {
-                    mWindowManager.setAppVisibility(r.appToken, false);
+                // XUJAY: This does work for the background multiplexing
+                if (r.toString().contains("spotify")) {
+                    Slog.v(TAG_STATES,
+                           "Spotify: Not Moving to STOPPING: " + r);
+                } else {
+                    r.stopped = false;
+                    if (DEBUG_STATES) Slog.v(TAG_STATES,
+                                             "Moving to STOPPING: " + r + " (stop requested)");
+                    r.state = ActivityState.STOPPING;
+                    if (DEBUG_VISIBILITY) Slog.v(TAG_VISIBILITY,
+                                                 "Stopping visible=" + r.visible + " for " + r);
+                    if (!r.visible) {
+                        mWindowManager.setAppVisibility(r.appToken, false);
+                    }
+                    r.app.thread.scheduleStopActivity(r.appToken, r.visible, r.configChangeFlags);
+                    if (mService.isSleepingOrShuttingDown()) {
+                        r.setSleeping(true);
+                    }
+                    Message msg = mHandler.obtainMessage(STOP_TIMEOUT_MSG, r);
+                    mHandler.sendMessageDelayed(msg, STOP_TIMEOUT);
                 }
-                r.app.thread.scheduleStopActivity(r.appToken, r.visible, r.configChangeFlags);
-                if (mService.isSleepingOrShuttingDown()) {
-                    r.setSleeping(true);
-                }
-                Message msg = mHandler.obtainMessage(STOP_TIMEOUT_MSG, r);
-                mHandler.sendMessageDelayed(msg, STOP_TIMEOUT);
             } catch (Exception e) {
                 // Maybe just ignore exceptions here...  if the process
                 // has crashed, our death notification will clean things
